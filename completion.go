@@ -2,8 +2,10 @@ package gomplete
 
 // Completion is the interface has the completion infromation.
 type Completion interface {
+	// Complete returns the command line completion reply from args.
 	Complete(args *Args) Reply
 }
 
-// Reply is the alias for map[string]string
+// Reply is the alias for map[string]string.
+// The key is the candidate completion word, and the value is the description.
 type Reply map[string]string
