@@ -37,7 +37,7 @@ func TestArgsCurrent(t *testing.T) {
 		t.Run(expect, func(t *testing.T) {
 			actual := args.Current()
 			if expect != actual {
-				t.Errorf("current arg is not match. expect: %v, actual: %v", expect, actual)
+				t.Errorf("Current argument is invalid. expect: %v, actual: %v", expect, actual)
 			}
 		})
 	}
@@ -62,11 +62,11 @@ func TestArgsNext(t *testing.T) {
 			next := args.Next()
 			if i < 0 {
 				if next != nil {
-					t.Errorf("next should be nil, but actual %v", next)
+					t.Errorf("The next should be nil, but actual %v.", next)
 				}
 			} else {
 				if i != next.index {
-					t.Errorf("the index of the next args is mismatch. expect: %v, actual: %v", i, next.index)
+					t.Errorf("The index of the next args is mismatch. expect: %v, actual: %v", i, next.index)
 				}
 			}
 		})
