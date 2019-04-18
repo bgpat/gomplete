@@ -17,10 +17,9 @@ func (c *Command) Complete(ctx context.Context, args *Args) Reply {
 	if strings.HasPrefix(c.Name, args.Current()) {
 		if args.IsLast() {
 			return Reply{c.Name: c.Description}
-		} else {
-			if c.Sub != nil {
-				return c.Sub.Complete(ctx, args.Next())
-			}
+		}
+		if c.Sub != nil {
+			return c.Sub.Complete(ctx, args.Next())
 		}
 	}
 	return nil
