@@ -46,8 +46,7 @@ func TestMapComplete(t *testing.T) {
 				"bar": "bar",
 				"baz": "baz",
 			},
-			expect: Reply{},
-			ef:     "The reply must be empty.",
+			ef: "The reply must be empty.",
 		},
 		"not last arg": {
 			args: NewArgs([]string{"foo", "bar"}),
@@ -56,14 +55,19 @@ func TestMapComplete(t *testing.T) {
 				"bar": "bar",
 				"baz": "baz",
 			},
-			expect: Reply{},
-			ef:     "The reply must be empty.",
+			ef: "The reply must be empty.",
 		},
 	} {
 		t.Run(desc, func(t *testing.T) {
 			actual := testcase.comp.Complete(testcase.args)
-			if !reflect.DeepEqual(actual, testcase.expect) {
-				t.Errorf(testcase.ef+" expect: %#v, actual: %#v", testcase.expect, actual)
+			if testcase.expect == nil {
+				if len(actual) > 0 {
+					t.Errorf(testcase.ef+" expect: %#v, actual: %#v", testcase.expect, actual)
+				}
+			} else {
+				if !reflect.DeepEqual(actual, testcase.expect) {
+					t.Errorf(testcase.ef+" expect: %#v, actual: %#v", testcase.expect, actual)
+				}
 			}
 		})
 	}

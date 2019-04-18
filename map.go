@@ -9,7 +9,7 @@ type Map map[string]string
 // Complete returns the pairs that have the prefix of current arg.
 func (m *Map) Complete(args *Args) Reply {
 	if !args.IsLast() {
-		return Reply{}
+		return nil
 	}
 	reply := Reply{}
 	for k, v := range *m {
