@@ -6,17 +6,17 @@ import (
 	"testing"
 )
 
-func TestMapComplete(t *testing.T) {
+func TestCommandComplete(t *testing.T) {
 	ctx := context.Background()
 	for desc, testcase := range map[string]struct {
 		args   *Args
-		comp   Map
+		comp   Command
 		expect Reply
 		ef     string
 	}{
 		"no arg": {
 			args: NewArgs([]string{""}),
-			comp: Map{
+			comp: Command{
 				"foo": "foo",
 				"bar": "bar",
 				"baz": "baz",
@@ -30,7 +30,7 @@ func TestMapComplete(t *testing.T) {
 		},
 		"partial arg": {
 			args: NewArgs([]string{"ba"}),
-			comp: Map{
+			comp: Command{
 				"foo": "foo",
 				"bar": "bar",
 				"baz": "baz",
@@ -43,7 +43,7 @@ func TestMapComplete(t *testing.T) {
 		},
 		"not match": {
 			args: NewArgs([]string{"hoge"}),
-			comp: Map{
+			comp: Command{
 				"foo": "foo",
 				"bar": "bar",
 				"baz": "baz",
@@ -52,7 +52,7 @@ func TestMapComplete(t *testing.T) {
 		},
 		"not last arg": {
 			args: NewArgs([]string{"foo", "bar"}),
-			comp: Map{
+			comp: Command{
 				"foo": "foo",
 				"bar": "bar",
 				"baz": "baz",
