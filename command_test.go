@@ -1,76 +1,48 @@
 package gomplete
 
-import (
-	"context"
-	"reflect"
-	"testing"
-)
+import "testing"
 
 func TestCommandComplete(t *testing.T) {
-	ctx := context.Background()
-	for desc, testcase := range map[string]struct {
-		args   *Args
-		comp   Command
-		expect Reply
-		ef     string
-	}{
-		"no arg": {
-			args: NewArgs([]string{""}),
-			comp: Command{
-				"foo": "foo",
-				"bar": "bar",
-				"baz": "baz",
-			},
-			expect: Reply{
-				"foo": "foo",
-				"bar": "bar",
-				"baz": "baz",
-			},
-			ef: "What same as the completion candidates must be returned.",
+	comp := &Command{Name: "foo", Description: "bar"}
+	for _, tc := range []testCase{
+		{
+			description: "no arg",
+			args:        NewArgs([]string{""}),
+			completion:  comp,
+			expect:      Reply{"foo": "bar"},
+			errorFormat: "Completion must return the reply.",
 		},
-		"partial arg": {
-			args: NewArgs([]string{"ba"}),
-			comp: Command{
-				"foo": "foo",
-				"bar": "bar",
-				"baz": "baz",
-			},
-			expect: Reply{
-				"bar": "bar",
-				"baz": "baz",
-			},
-			ef: "The reply must be the all of what contains the prefix.",
+		{
+			description: "partial arg",
+			args:        NewArgs([]string{"fo"}),
+			completion:  comp,
+			expect:      Reply{"foo": "bar"},
+			errorFormat: "The reply must be the all of what contains the prefix.",
 		},
-		"not match": {
-			args: NewArgs([]string{"hoge"}),
-			comp: Command{
-				"foo": "foo",
-				"bar": "bar",
-				"baz": "baz",
-			},
-			ef: "The reply must be empty.",
+		{
+			description: "not match",
+			args:        NewArgs([]string{"o"}),
+			completion:  comp,
+			errorFormat: "The reply must be empty.",
 		},
-		"not last arg": {
-			args: NewArgs([]string{"foo", "bar"}),
-			comp: Command{
-				"foo": "foo",
-				"bar": "bar",
-				"baz": "baz",
+		{
+			description: "not last arg",
+			args:        NewArgs([]string{"foo", "bar"}),
+			completion:  comp,
+			errorFormat: "The reply must be empty.",
+		},
+		{
+			description: "sub",
+			args:        NewArgs([]string{"foo", ""}),
+			completion: &Command{
+				Name:        "foo",
+				Description: "bar",
+				Sub:         &Union{comp},
 			},
-			ef: "The reply must be empty.",
+			expect:      Reply{"foo": "bar"},
+			errorFormat: "Completion must return the nested reply.",
 		},
 	} {
-		t.Run(desc, func(t *testing.T) {
-			actual := testcase.comp.Complete(ctx, testcase.args)
-			if testcase.expect == nil {
-				if len(actual) > 0 {
-					t.Errorf(testcase.ef+" expect: %#v, actual: %#v", testcase.expect, actual)
-				}
-			} else {
-				if !reflect.DeepEqual(actual, testcase.expect) {
-					t.Errorf(testcase.ef+" expect: %#v, actual: %#v", testcase.expect, actual)
-				}
-			}
-		})
+		tc.run(t)
 	}
 }
