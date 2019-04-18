@@ -1,9 +1,11 @@
 package gomplete
 
+import "context"
+
 // Completion is the interface has the completion infromation.
 type Completion interface {
 	// Complete returns the command line completion reply from args.
-	Complete(args *Args) Reply
+	Complete(ctx context.Context, args *Args) Reply
 }
 
 // Reply is the alias for map[string]string.

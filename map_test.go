@@ -1,11 +1,13 @@
 package gomplete
 
 import (
+	"context"
 	"reflect"
 	"testing"
 )
 
 func TestMapComplete(t *testing.T) {
+	ctx := context.Background()
 	for desc, testcase := range map[string]struct {
 		args   *Args
 		comp   Map
@@ -59,7 +61,7 @@ func TestMapComplete(t *testing.T) {
 		},
 	} {
 		t.Run(desc, func(t *testing.T) {
-			actual := testcase.comp.Complete(testcase.args)
+			actual := testcase.comp.Complete(ctx, testcase.args)
 			if testcase.expect == nil {
 				if len(actual) > 0 {
 					t.Errorf(testcase.ef+" expect: %#v, actual: %#v", testcase.expect, actual)
