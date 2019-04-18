@@ -28,7 +28,7 @@ func (a *Args) IsLast() bool {
 // Next returns an immutable Args pointed the next argument.
 // If the index is the last, returns nil.
 func (a *Args) Next() *Args {
-	if a.IsLast() {
+	if len(a.words) <= a.index {
 		return nil
 	}
 	return &Args{

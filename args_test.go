@@ -13,7 +13,6 @@ func TestNewArgs(t *testing.T) {
 		t.Errorf("words is not match to src. expect: %v, actual: %v", src, args.words)
 	}
 	src[1] = "awesome"
-	t.Log(args)
 	if reflect.DeepEqual(args.words, src) {
 		t.Error("words links to the soruce slice")
 	}
@@ -57,13 +56,19 @@ func TestArgsNext(t *testing.T) {
 			words: []string{"zero", "one", "two"},
 			index: 2,
 		},
+		-2: Args{
+			words: []string{},
+			index: 0,
+		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			next := args.Next()
 			if i < 0 {
 				if next != nil {
-					t.Errorf("The next should be nil, but actual %v.", next)
+					t.Errorf("The next must be nil, but actual %v.", next)
 				}
+			} else if next == nil {
+				t.Errorf("The next must not be nil. expect: %v", i)
 			} else {
 				if i != next.index {
 					t.Errorf("The index of the next args is mismatch. expect: %v, actual: %v", i, next.index)
