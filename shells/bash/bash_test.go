@@ -3,6 +3,7 @@ package bash
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -106,14 +107,43 @@ func TestScript(t *testing.T) {
 	cmd.Env = []string{}
 	tty, err := pty.Start(cmd)
 	fmt.Fprintf(tty, "source %q\n", compfile)
-	fmt.Fprint(tty, "awesome \t")
-	fmt.Fprint(tty, "\nexit\n")
-	out, err := ioutil.ReadAll(tty)
-	if err != nil {
+	if err := writeAndWait(ctx, tty, "awesome "); err != nil {
 		t.Error(err)
 	}
-	t.Log(string(out))
-	if err := cmd.Wait(); err != nil {
+	tty.WriteString("\t\t")
+	if err := waitString(ctx, tty, "aaa abb bbb"); err != nil {
 		t.Error(err)
+	}
+}
+
+func writeAndWait(ctx context.Context, tty io.ReadWriter, s string) error {
+	io.WriteString(tty, s)
+	return waitString(ctx, tty, s)
+}
+
+func waitString(ctx context.Context, tty io.Reader, s string) error {
+	ticker := time.NewTicker(time.Millisecond)
+	defer ticker.Stop()
+	suffix := ""
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+			buf := make([]byte, 1024)
+			n, err := tty.Read(buf)
+			println(n, err)
+			if err != nil {
+				return err
+			}
+			suffix += string(buf[:n])
+			if len(suffix) > len(s) {
+				suffix = suffix[len(suffix)-len(s) : len(suffix)]
+			}
+			if suffix == s {
+				return nil
+			}
+			fmt.Printf("%q", suffix)
+		}
 	}
 }

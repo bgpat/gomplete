@@ -11,7 +11,7 @@ import (
 
 const scriptTemplate = `
 _{{.Name}}_completion () {
-  COMPREPLY=( hoge )
+  COMPREPLY=( aaa bbb abb )
 }
 complete -o default -F _{{.Name}}_completion {{.Name}}
 `
