@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -90,28 +91,40 @@ func TestFormat(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
-	comp := Completion{Name: "awesome"}
-	script := comp.Script("awesome -completion -- ")
 	dir, err := ioutil.TempDir("", "example")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
-	compfile := filepath.Join(dir, "awesome")
+
+	binfile := filepath.Join(dir, "example")
+	excmd := exec.Command("go", "build", "-o", binfile, "../../examples/bash")
+	if err := excmd.Run(); err != nil {
+		t.Error(err)
+	}
+
+	compfile := filepath.Join(dir, "example.completion")
+	comp := Completion{Name: "example"}
+	script := comp.Script(binfile + " -completion --")
 	if err := ioutil.WriteFile(compfile, []byte(script), 0644); err != nil {
 		t.Error(err)
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "bash", "--noprofile", "--norc", "-o", "errexit")
-	cmd.Env = []string{}
+	cmd.Env = []string{"PATH=" + dir}
 	tty, err := pty.Start(cmd)
 	fmt.Fprintf(tty, "source %q\n", compfile)
-	if err := writeAndWait(ctx, tty, "awesome "); err != nil {
+	if err := writeAndWait(ctx, tty, "example "); err != nil {
 		t.Error(err)
 	}
-	tty.WriteString("\t\t")
-	if err := waitString(ctx, tty, "aaa abb bbb"); err != nil {
+	tty.WriteString("\t")
+	if err := waitString(ctx, tty, "foo"); err != nil {
+		t.Error(err)
+	}
+	tty.WriteString("\t")
+	if err := waitString(ctx, tty, "bar"); err != nil {
 		t.Error(err)
 	}
 }
@@ -124,7 +137,7 @@ func writeAndWait(ctx context.Context, tty io.ReadWriter, s string) error {
 func waitString(ctx context.Context, tty io.Reader, s string) error {
 	ticker := time.NewTicker(time.Millisecond)
 	defer ticker.Stop()
-	suffix := ""
+	text := ""
 	for {
 		select {
 		case <-ctx.Done():
@@ -132,18 +145,13 @@ func waitString(ctx context.Context, tty io.Reader, s string) error {
 		case <-ticker.C:
 			buf := make([]byte, 1024)
 			n, err := tty.Read(buf)
-			println(n, err)
 			if err != nil {
 				return err
 			}
-			suffix += string(buf[:n])
-			if len(suffix) > len(s) {
-				suffix = suffix[len(suffix)-len(s) : len(suffix)]
-			}
-			if suffix == s {
+			text += string(buf[:n])
+			if strings.LastIndex(text, s) >= 0 {
 				return nil
 			}
-			fmt.Printf("%q", suffix)
 		}
 	}
 }
