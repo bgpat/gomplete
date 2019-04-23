@@ -13,7 +13,8 @@ import (
 
 // Flag is a implementation for flag.Value.
 type Flag struct {
-	gomplete.Shell
+	Shell      gomplete.Shell
+	Completion gomplete.Completion
 }
 
 // String returns empty string.
@@ -30,9 +31,9 @@ func (f *Flag) Set(s string) error {
 
 	for i, arg := range os.Args {
 		if arg == "--" {
-			args := gomplete.NewArgs(os.Args[i+1:])
-			reply := f.Shell.Complete(context.Background(), args)
-			fmt.Print(f.Shell.Format(reply))
+			args := gomplete.NewArgs(os.Args[i+2:])
+			reply := f.Completion.Complete(context.Background(), args)
+			fmt.Print(f.Shell.FormatReply(reply))
 			return nil
 		}
 	}
