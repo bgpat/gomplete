@@ -2,7 +2,6 @@ package bash
 
 import (
 	"bytes"
-	"context"
 	"strings"
 	"text/template"
 
@@ -34,26 +33,14 @@ _{{.Name}}_completion() {
 complete -o default -F _{{.Name}}_completion {{.Name}}
 `
 
-// A Completion is the implementation of Shell for bash.
-type Completion struct {
+// Shell is the implementation of gomplete.Shell for bash.
+type Shell struct {
 	Name string
 	Sub  gomplete.Completion
 }
 
-// Complete seeks the args by 1.
-func (c *Completion) Complete(ctx context.Context, args *gomplete.Args) gomplete.Reply {
-	if c.Sub == nil {
-		return nil
-	}
-	a := args.Next()
-	if a == nil {
-		return nil
-	}
-	return c.Sub.Complete(ctx, a)
-}
-
-// Format returns reply keys joined by newline.
-func (c *Completion) Format(reply gomplete.Reply) string {
+// FormatReply returns reply keys joined by newline.
+func (s *Shell) FormatReply(reply gomplete.Reply) string {
 	keys := make([]string, 0, len(reply))
 	for k := range reply {
 		keys = append(keys, k)
@@ -62,15 +49,15 @@ func (c *Completion) Format(reply gomplete.Reply) string {
 }
 
 // Script returns the shell script to parse replies.
-func (c *Completion) Script(cmdline string) string {
+func (s *Shell) Script(cmdline string) string {
 	buf := bytes.Buffer{}
-	t := template.Must(template.New(c.Name).Parse(scriptTemplate))
+	t := template.Must(template.New(s.Name).Parse(scriptTemplate))
 	t.Execute(&buf, struct {
-		*Completion
+		*Shell
 		CmdLine string
 	}{
-		Completion: c,
-		CmdLine:    cmdline,
+		Shell:   s,
+		CmdLine: cmdline,
 	})
 	return buf.String()
 }
