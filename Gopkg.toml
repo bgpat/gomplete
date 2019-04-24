@@ -2,6 +2,10 @@
   name = "github.com/kr/pty"
   version = "v1.1.4"
 
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "v0.8.1"
+
 [prune]
   go-tests = true
   unused-packages = true

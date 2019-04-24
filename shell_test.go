@@ -1,6 +1,7 @@
 package gomplete
 
 import (
+	"bytes"
 	"io"
 	"reflect"
 	"sort"
@@ -10,7 +11,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-type testShell struct{}
+type testShell struct {
+	ShellConfig
+}
+
+func (s *testShell) Args() *Args {
+	return NewArgs([]string{"foo", "bar", "baz"})
+}
 
 func (s *testShell) FormatReply(reply Reply, w io.Writer) error {
 	str := strconv.Itoa(len(reply))
@@ -18,8 +25,9 @@ func (s *testShell) FormatReply(reply Reply, w io.Writer) error {
 	return errors.WithStack(err)
 }
 
-func (s *testShell) Script(cmdline string) string {
-	return cmdline
+func (s *testShell) OutputScript(w io.Writer) error {
+	_, err := io.WriteString(w, s.Name)
+	return errors.WithStack(err)
 }
 
 func TestRegisterShell(t *testing.T) {
@@ -27,7 +35,7 @@ func TestRegisterShell(t *testing.T) {
 		unregisterAllShells()
 		for _, name := range []string{"foo", "bar", "baz"} {
 			t.Run(name, func(t *testing.T) {
-				if err := RegisterShell(name, &testShell{}); err != nil {
+				if err := registerTestShell(name); err != nil {
 					t.Error(err)
 				}
 				if _, ok := shells[name]; !ok {
@@ -44,54 +52,74 @@ func TestRegisterShell(t *testing.T) {
 	})
 	t.Run("nil", func(t *testing.T) {
 		if err := RegisterShell("nil", nil); err == nil {
-			t.Error("should returns an error")
+			t.Error("must returns an error")
 		}
 	})
 	t.Run("duplicated", func(t *testing.T) {
 		unregisterAllShells()
-		if err := RegisterShell("awesome", &testShell{}); err != nil {
+		if err := registerTestShell("test"); err != nil {
 			t.Error(err)
 		}
-		if err := RegisterShell("awesome", &testShell{}); err == nil {
-			t.Error("should returns an error")
+		if err := registerTestShell("test"); err == nil {
+			t.Error("must returns an error")
 		}
 	})
 }
 
-func TestFormatReply(t *testing.T) {
+func TestNewShell(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		unregisterAllShells()
-		if err := RegisterShell("test", &testShell{}); err != nil {
+		if err := registerTestShell("test"); err != nil {
 			t.Error(err)
 		}
-		for i, reply := range []Reply{
-			nil,
-			{"": ""},
-			{"": "", "a": ""},
-			{"": "", "a": "", "b": ""},
-		} {
-			expect := strconv.Itoa(i)
-			t.Run(expect, func(t *testing.T) {
-				actual, err := FormatReply("test", reply)
-				if err != nil {
-					t.Error(err)
-				}
-				if expect != actual {
-					t.Errorf("expect %v, but actual %v", expect, actual)
-				}
-			})
+		shell, err := NewShell("test", ShellConfig{
+			Name: "test",
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		if shell == nil {
+			t.Error("shell is nil")
+		}
+		var buf bytes.Buffer
+		if err := shell.OutputScript(&buf); err != nil {
+			t.Error(err)
+		}
+		if buf.String() != "test" {
+			t.Error("not match to the testcase")
 		}
 	})
 	t.Run("unknown shell", func(t *testing.T) {
 		unregisterAllShells()
-		if _, err := FormatReply("test", Reply{}); err == nil {
-			t.Error("should returns an error")
+		if _, err := NewShell("test", ShellConfig{}); err == nil {
+			t.Error("must return nil because test shell is not registered")
+		}
+	})
+	t.Run("failed to initialize", func(t *testing.T) {
+		unregisterAllShells()
+		if err := registerErrorShell("test"); err != nil {
+			t.Error(err)
+		}
+		if _, err := NewShell("test", ShellConfig{}); err == nil {
+			t.Error("must return nil")
 		}
 	})
 }
 
+func registerTestShell(name string) error {
+	return errors.WithStack(RegisterShell(name, func(config ShellConfig) (Shell, error) {
+		return &testShell{config}, nil
+	}))
+}
+
+func registerErrorShell(name string) error {
+	return errors.WithStack(RegisterShell(name, func(ShellConfig) (Shell, error) {
+		return nil, errors.New("this constructor always return an error")
+	}))
+}
+
 func unregisterAllShells() {
 	shellsMu.Lock()
-	shells = make(map[string]Shell)
+	shells = make(map[string]func(ShellConfig) (Shell, error))
 	shellsMu.Unlock()
 }
