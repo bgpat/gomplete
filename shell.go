@@ -3,6 +3,7 @@ package gomplete
 import (
 	"errors"
 	"fmt"
+	"io"
 	"sync"
 )
 
@@ -11,13 +12,18 @@ var (
 	shells   = make(map[string]Shell)
 )
 
-// A Shell is the shell completion interface.
+// Shell is the shell completion interface.
 type Shell interface {
 	// FormatReply converts the completion reply to the string the script output by Script() can parse.
-	FormatReply(reply Reply) string
+	FormatReply(reply Reply, w io.Writer) error
 
-	// Script outputs the shell script to parse the reply and register the completion.
-	Script(cmdline string) string
+	// OutputScript outputs the shell script to parse the reply and register the completion.
+	OutputScript(config ShellConfig, w io.Writer) error
+}
+
+// ShellConfig is the configuration for shell.
+type ShellConfig struct {
+	Command string // The prefix of completion command.
 }
 
 // RegisterShell makes a shell implementation available by the provided name.
@@ -46,8 +52,17 @@ func Shells() []string {
 	return list
 }
 
+// FormatReply converts the completion reply to the string for present shell.
 func FormatReply(name string, reply Reply) (string, error) {
+	shell := getShell(name)
+	if shell == nil {
+		return "", fmt.Errorf("unknown shell %q (forgotten import?)", name)
+	}
+	return shell.FormatReply(reply), nil
+}
+
+func getShell(name string) Shell {
 	shellsMu.RLock()
-	shellsMu.RUnlock()
-	return "", nil
+	defer shellsMu.RUnlock()
+	return shells[name]
 }
