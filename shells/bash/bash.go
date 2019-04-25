@@ -1,11 +1,13 @@
 package bash
 
 import (
-	"bytes"
+	"io"
+	"sort"
 	"strings"
 	"text/template"
 
 	"github.com/bgpat/gomplete"
+	"github.com/pkg/errors"
 )
 
 const scriptTemplate = `
@@ -35,29 +37,38 @@ complete -o default -F _{{.Name}}_completion {{.Name}}
 
 // Shell is the implementation of gomplete.Shell for bash.
 type Shell struct {
-	Name string
-	Sub  gomplete.Completion
+	gomplete.ShellConfig
+}
+
+func init() {
+	gomplete.RegisterShell("bash", NewShell)
+}
+
+// NewShell returns a shell instance from shell config.
+func NewShell(config gomplete.ShellConfig) (gomplete.Shell, error) {
+	return &Shell{
+		ShellConfig: config,
+	}, nil
+}
+
+// Args returns returns command-line arguments to complete.
+func (s *Shell) Args() *gomplete.Args {
+	return gomplete.NewArgs(s.ShellConfig.Args)
 }
 
 // FormatReply returns reply keys joined by newline.
-func (s *Shell) FormatReply(reply gomplete.Reply) string {
+func (s *Shell) FormatReply(reply gomplete.Reply, w io.Writer) error {
 	keys := make([]string, 0, len(reply))
 	for k := range reply {
 		keys = append(keys, k)
 	}
-	return strings.Join(keys, "\n")
+	sort.Strings(keys)
+	_, err := io.WriteString(w, strings.Join(keys, "\n"))
+	return errors.WithStack(err)
 }
 
-// Script returns the shell script to parse replies.
-func (s *Shell) Script(cmdline string) string {
-	buf := bytes.Buffer{}
+// OutputScript returns the shell script to parse replies.
+func (s *Shell) OutputScript(w io.Writer) error {
 	t := template.Must(template.New(s.Name).Parse(scriptTemplate))
-	t.Execute(&buf, struct {
-		*Shell
-		CmdLine string
-	}{
-		Shell:   s,
-		CmdLine: cmdline,
-	})
-	return buf.String()
+	return errors.WithStack(t.Execute(w, s))
 }

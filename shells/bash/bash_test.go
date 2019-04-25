@@ -1,48 +1,74 @@
 package bash
 
 import (
-	"context"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
+	"bytes"
+	"strconv"
 	"testing"
-	"time"
 
-	"github.com/kr/pty"
+	_ "github.com/kr/pty"
 
 	"github.com/bgpat/gomplete"
 )
 
-func TestFormat(t *testing.T) {
-	shell := Shell{}
-	reply := gomplete.Reply{
-		"foo": "foo",
-		"bar": "bar",
-		"baz": "baz",
-	}
-	actual := shell.FormatReply(reply)
-	count := 0
-	for _, expect := range []string{
-		"foo\nbar\nbaz",
-		"foo\nbaz\nbar",
-		"bar\nfoo\nbaz",
-		"bar\nbaz\nfoo",
-		"baz\nfoo\nbar",
-		"baz\nbar\nfoo",
-	} {
-		if actual == expect {
-			count++
-		}
-	}
-	if count != 1 {
-		t.Errorf("The output is wrong. %q", actual)
+func TestRegisterShell(t *testing.T) {
+	_, err := gomplete.NewShell("bash", gomplete.ShellConfig{})
+	if err != nil {
+		t.Error(err)
 	}
 }
 
+func TestNewShell(t *testing.T) {
+	shell, err := NewShell(gomplete.ShellConfig{})
+	if err != nil {
+		t.Error(err)
+	}
+	if shell == nil {
+		t.Error("shell is nil")
+	}
+}
+
+func TestArgs(t *testing.T) {
+	testcase := []string{"foo", "bar", "baz"}
+	shell := Shell{
+		gomplete.ShellConfig{
+			Args: testcase,
+		},
+	}
+	args := shell.Args()
+	if args == nil {
+		t.Error("args is nil")
+	}
+	for i, expect := range testcase {
+		expect := expect
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			actual := args.Current()
+			if actual != expect {
+				t.Errorf("expect %q, but actual %q", expect, actual)
+			}
+			args = args.Next()
+		})
+	}
+}
+
+func TestFormatReply(t *testing.T) {
+	shell := Shell{}
+	reply := gomplete.Reply{
+		"foo": "FOO",
+		"bar": "BAR",
+		"baz": "BAZ",
+	}
+	var buf bytes.Buffer
+	if err := shell.FormatReply(reply, &buf); err != nil {
+		t.Error(err)
+	}
+	expect := "bar\nbaz\nfoo"
+	actual := buf.String()
+	if actual != expect {
+		t.Errorf("output is wrong. expect %q, but actual %q", expect, actual)
+	}
+}
+
+/*
 func TestScript(t *testing.T) {
 	dir, err := ioutil.TempDir("", "example")
 	if err != nil {
@@ -108,3 +134,4 @@ func waitString(ctx context.Context, tty io.Reader, s string) error {
 		}
 	}
 }
+*/
