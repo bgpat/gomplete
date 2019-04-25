@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -36,24 +37,19 @@ func (f *Flag) Set(name string) error {
 	if args == nil {
 		return errors.WithStack(f.outputScript(name))
 	}
+	fmt.Fprintf(os.Stderr, "%#v\n", args)
 
-	/*
-		args := make([]string, 0, len(os.Args)+1)
-		args = append(args, os.Args...)
-		args = append(args, "--")
-		arg0, err := filepath.Abs(os.Args[0])
-		if err != nil {
-			return nil
-		}
-		script := f.Shell.Script(arg0 + strings.Join(args[1:], " "))
-		os.Stdout.WriteString(script)
-	*/
-	return nil
+	shell, err := gomplete.NewShell(name, f.Config)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	reply := f.Completion.Complete(context.Background(), args)
+	return errors.WithStack(shell.FormatReply(reply, os.Stdout))
 }
 
 func (f *Flag) outputScript(name string) error {
 	if isatty.IsTerminal(os.Stdout.Fd()) {
-		fmt.Printf("usage: %s <(%s)\n", name, strings.Join(os.Args, " "))
+		fmt.Printf("usage: source <(%s)\n", strings.Join(os.Args, " "))
 		return nil
 	}
 	shell, err := gomplete.NewShell(name, f.Config)

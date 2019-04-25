@@ -12,6 +12,7 @@ import (
 )
 
 const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
+	set -x
 	IFS=$'\n'
 	COMPREPLY=( $({{.CompleteCommand}} {{.ShellName}} -- "${COMP_WORDS[@]}") )
 }
