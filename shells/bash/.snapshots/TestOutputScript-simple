@@ -2,5 +2,5 @@ _simple_completion() {
 	IFS=$'\n'
 	COMPREPLY=( $(simple -completion --  -- "${COMP_WORDS[@]}") )
 }
-complete -o default -F _simple_completion simple
+complete -F _simple_completion simple
 

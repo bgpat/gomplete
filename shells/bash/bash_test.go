@@ -29,7 +29,7 @@ func TestNewShell(t *testing.T) {
 }
 
 func TestArgs(t *testing.T) {
-	testcase := []string{"foo", "bar", "baz"}
+	testcase := []string{"command", "foo", "bar", "baz"}
 	shell := Shell{
 		gomplete.ShellConfig{
 			Args: testcase,
@@ -39,7 +39,7 @@ func TestArgs(t *testing.T) {
 	if args == nil {
 		t.Error("args is nil")
 	}
-	for i, expect := range testcase {
+	for i, expect := range testcase[1:] {
 		expect := expect
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			actual := args.Current()

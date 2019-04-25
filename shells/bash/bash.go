@@ -12,11 +12,10 @@ import (
 )
 
 const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
-	set -x
 	IFS=$'\n'
 	COMPREPLY=( $({{.CompleteCommand}} {{.ShellName}} -- "${COMP_WORDS[@]}") )
 }
-complete -o default -F _{{sanitize .CommandName}}_completion {{.CommandName}}
+complete -F _{{sanitize .CommandName}}_completion {{.CommandName}}
 `
 
 var (
@@ -54,7 +53,7 @@ func newShell(config gomplete.ShellConfig) (*Shell, error) {
 
 // Args returns returns command-line arguments to complete.
 func (s *Shell) Args() *gomplete.Args {
-	return gomplete.NewArgs(s.ShellConfig.Args)
+	return gomplete.NewArgs(s.ShellConfig.Args).Next()
 }
 
 // FormatReply returns reply keys joined by newline.

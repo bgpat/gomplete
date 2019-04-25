@@ -27,23 +27,23 @@ func (f *Flag) String() string {
 
 // Set aborts parsing flags and runs the shell completion.
 func (f *Flag) Set(name string) error {
-	var args *gomplete.Args
+	args := []string{}
 	for i, arg := range os.Args {
 		if arg == "--" {
-			args = gomplete.NewArgs(os.Args[i+1:])
+			args = append(args, os.Args[i+1:]...)
 			break
 		}
 	}
-	if args == nil {
+	if len(args) == 0 {
 		return errors.WithStack(f.outputScript(name))
 	}
-	fmt.Fprintf(os.Stderr, "%#v\n", args)
 
+	f.Config.Args = args
 	shell, err := gomplete.NewShell(name, f.Config)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	reply := f.Completion.Complete(context.Background(), args)
+	reply := f.Completion.Complete(context.Background(), shell.Args())
 	return errors.WithStack(shell.FormatReply(reply, os.Stdout))
 }
 

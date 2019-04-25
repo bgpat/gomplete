@@ -14,6 +14,20 @@ func main() {
 		Sub: &gomplete.Command{
 			Name:        "bar",
 			Description: "second sub command",
+			Sub: &gomplete.Union{
+				&gomplete.Command{
+					Name:        "hoge",
+					Description: "hoge",
+				},
+				&gomplete.Command{
+					Name:        "fuga",
+					Description: "fuga",
+				},
+				&gomplete.Command{
+					Name:        "piyo",
+					Description: "piyo",
+				},
+			},
 		},
 	}
 	cfg := gomplete.ShellConfig{

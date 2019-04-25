@@ -2,5 +2,5 @@ _kebab_case_completion() {
 	IFS=$'\n'
 	COMPREPLY=( $(kebab-case -completion --  -- "${COMP_WORDS[@]}") )
 }
-complete -o default -F _kebab_case_completion kebab-case
+complete -F _kebab_case_completion kebab-case
 
