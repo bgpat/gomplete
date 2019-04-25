@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/bradleyjkemp/cupaloy"
 	_ "github.com/kr/pty"
 
 	"github.com/bgpat/gomplete"
@@ -65,6 +66,32 @@ func TestFormatReply(t *testing.T) {
 	actual := buf.String()
 	if actual != expect {
 		t.Errorf("output is wrong. expect %q, but actual %q", expect, actual)
+	}
+}
+
+func TestOutputScript(t *testing.T) {
+	for _, cfg := range []gomplete.ShellConfig{
+		{
+			CommandName:     "simple",
+			CompleteCommand: "simple -completion --",
+		},
+		{
+			CommandName:     "kebab-case",
+			CompleteCommand: "kebab-case -completion --",
+		},
+	} {
+		cfg := cfg
+		t.Run(cfg.CommandName, func(t *testing.T) {
+			shell, err := newShell(cfg)
+			if err != nil {
+				t.Error(shell)
+			}
+			var buf bytes.Buffer
+			if err := shell.OutputScript(&buf); err != nil {
+				t.Error(err)
+			}
+			cupaloy.SnapshotT(t, buf.String())
+		})
 	}
 }
 

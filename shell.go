@@ -27,11 +27,12 @@ type Shell interface {
 
 // ShellConfig is the configuration for shell.
 type ShellConfig struct {
-	Name    string // The name of completion function.
-	Command string // The prefix of completion command.
+	CommandName     string // The name of completion function.
+	CompleteCommand string // The prefix of completion command.
 
-	Args []string          // The command line arguments.
-	Env  map[string]string // The map of environment variables.
+	Args      []string          // The command line arguments.
+	Env       map[string]string // The map of environment variables.
+	ShellName string            //The name of the shell
 }
 
 // RegisterShell makes a shell implementation available by the provided name.
@@ -68,7 +69,9 @@ func NewShell(name string, config ShellConfig) (Shell, error) {
 	if constructor == nil {
 		return nil, fmt.Errorf("unknown shell %q (forgotten import?)", name)
 	}
-	shell, err := constructor(config)
+	cfg := config
+	cfg.ShellName = name
+	shell, err := constructor(cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to initialize %q", name)
 	}

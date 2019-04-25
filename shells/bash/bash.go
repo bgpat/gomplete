@@ -2,6 +2,7 @@ package bash
 
 import (
 	"io"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -10,30 +11,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-const scriptTemplate = `
-_{{.Name}}_completion() {
-	local words cword
-	if type _get_comp_words_by_ref &>/dev/null; then
-		_get_comp_words_by_ref -n = -n @ -n : -w words -i cword
-	else
-		cword="$COMP_CWORD"
-		words=("${COMP_WORDS[@]}")
-	fi
-	local si="$IFS"
-	IFS=$'\n' COMPREPLY=($( \
-		COMP_CWORD="$cword" \
-		COMP_LINE="$COMP_LINE" \
-		COMP_POINT="$COMP_POINT" \
-		{{.CmdLine}} "${words[@]}" \
-		2>/dev/null \
-	)) || return $?
-	IFS="$si"
-	if type __ltrim_colon_completions &>/dev/null; then
-		__ltrim_colon_completions "${words[cword]}"
-	fi
+const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
+	IFS=$'\n'
+	COMPREPLY=( $({{.CompleteCommand}} {{.ShellName}} -- "${COMP_WORDS[@]}") )
 }
-complete -o default -F _{{.Name}}_completion {{.Name}}
+complete -o default -F _{{sanitize .CommandName}}_completion {{.CommandName}}
 `
+
+var (
+	funcMap    template.FuncMap
+	sanitizeRe = regexp.MustCompile("[^a-zA-Z0-9]+")
+)
 
 // Shell is the implementation of gomplete.Shell for bash.
 type Shell struct {
@@ -41,11 +29,23 @@ type Shell struct {
 }
 
 func init() {
-	gomplete.RegisterShell("bash", NewShell)
+	if err := gomplete.RegisterShell("bash", NewShell); err != nil {
+		panic(err)
+	}
+
+	funcMap = template.FuncMap{
+		"sanitize": func(str string) string {
+			return sanitizeRe.ReplaceAllString(str, "_")
+		},
+	}
 }
 
 // NewShell returns a shell instance from shell config.
 func NewShell(config gomplete.ShellConfig) (gomplete.Shell, error) {
+	return newShell(config)
+}
+
+func newShell(config gomplete.ShellConfig) (*Shell, error) {
 	return &Shell{
 		ShellConfig: config,
 	}, nil
@@ -69,6 +69,9 @@ func (s *Shell) FormatReply(reply gomplete.Reply, w io.Writer) error {
 
 // OutputScript returns the shell script to parse replies.
 func (s *Shell) OutputScript(w io.Writer) error {
-	t := template.Must(template.New(s.Name).Parse(scriptTemplate))
+	t, err := template.New(s.CommandName).Funcs(funcMap).Parse(scriptTemplate)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	return errors.WithStack(t.Execute(w, s))
 }

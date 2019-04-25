@@ -26,7 +26,7 @@ func (s *testShell) FormatReply(reply Reply, w io.Writer) error {
 }
 
 func (s *testShell) OutputScript(w io.Writer) error {
-	_, err := io.WriteString(w, s.Name)
+	_, err := io.WriteString(w, s.CommandName)
 	return errors.WithStack(err)
 }
 
@@ -73,7 +73,7 @@ func TestNewShell(t *testing.T) {
 			t.Error(err)
 		}
 		shell, err := NewShell("test", ShellConfig{
-			Name: "test",
+			CommandName: "test",
 		})
 		if err != nil {
 			t.Error(err)

@@ -4,8 +4,7 @@ import (
 	"flag"
 
 	"github.com/bgpat/gomplete"
-	"github.com/bgpat/gomplete/examples"
-	"github.com/bgpat/gomplete/shells/bash"
+	"github.com/bgpat/gomplete/plugins"
 )
 
 func main() {
@@ -17,10 +16,13 @@ func main() {
 			Description: "second sub command",
 		},
 	}
-	shell := bash.Shell{}
-	flag.Var(&examples.Flag{
-		Shell:      &shell,
+	cfg := gomplete.ShellConfig{
+		CommandName:     "examples",
+		CompleteCommand: "examples -completion",
+	}
+	flag.Var(&plugins.Flag{
 		Completion: &comp,
+		Config:     cfg,
 	}, "completion", "output completion script")
 	flag.Parse()
 }
