@@ -31,7 +31,7 @@ func TestBash(t *testing.T) {
 	cmd := exec.CommandContext(ctx, "bash", "--noprofile", "--norc", "-o", "errexit")
 	cmd.Env = []string{"PATH=" + dir}
 	tty, err := pty.Start(cmd)
-	if _, err := tty.WriteString("source <(examples -completion bash)\n"); err != nil {
+	if _, err := tty.WriteString("source <(examples -completion=bash)\n"); err != nil {
 		t.Error(err)
 	}
 	if err := writeAndWait(ctx, tty, "examples "); err != nil {
