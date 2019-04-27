@@ -47,7 +47,6 @@ func RegisterShell(name string, constructor func(config ShellConfig) (Shell, err
 		panic(fmt.Errorf("%q is already registered", name))
 	}
 	shells[name] = constructor
-	return
 }
 
 // Shells returns a list of the names of the registered shells.
