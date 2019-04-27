@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
+const scriptTemplate = `_{{sanitize .CommandName}}() {
 	IFS=$'\n'
 	local -a completion
 	completion=( $( CURRENT=$CURRENT {{join .CompleteCommand}} -- "${words[@]}" ) )
@@ -21,7 +21,7 @@ const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
 		_values {{.CommandName}} "${completion[@]}"
 	fi
 }
-compdef _{{sanitize .CommandName}}_completion {{.CommandName}}
+compdef _{{sanitize .CommandName}} {{.CommandName}}
 `
 
 var (
@@ -81,6 +81,12 @@ func (s *Shell) Args() *gomplete.Args {
 func (s *Shell) FormatReply(reply gomplete.Reply, w io.Writer) error {
 	values := make([]string, 0, len(reply))
 	for k, v := range reply {
+		k = strings.ReplaceAll(k, "\\", "\\\\")
+		k = strings.ReplaceAll(k, "[", "\\]")
+		if v == "" {
+			values = append(values, k)
+			continue
+		}
 		v = strings.ReplaceAll(v, "\\", "\\\\")
 		v = strings.ReplaceAll(v, "]", "\\]")
 		values = append(values, fmt.Sprintf("%s[%s]", k, v))

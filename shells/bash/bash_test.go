@@ -41,7 +41,6 @@ func TestNewShell(t *testing.T) {
 				os.Setenv(k, v)
 			}
 			cfg := gomplete.NewShellConfig("bash")
-			t.Logf("config: %#v\n", cfg)
 			if testcase.expect != nil {
 				testcase.expect.ShellConfig = cfg
 			}

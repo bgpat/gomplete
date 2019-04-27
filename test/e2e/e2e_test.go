@@ -26,7 +26,7 @@ func waitString(ctx context.Context, r io.Reader, s string) (text string, err er
 			buf := make([]byte, 1024)
 			n, err := r.Read(buf)
 			if err != nil {
-				return text, err
+				return text, errors.Wrapf(err, "wait %q, but received %q", s, text)
 			}
 			text += string(buf[:n])
 			if strings.LastIndex(text, s) >= 0 {
