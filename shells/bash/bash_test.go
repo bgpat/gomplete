@@ -25,10 +25,10 @@ func TestNewShell(t *testing.T) {
 		env    map[string]string
 	}{
 		"no env": {
-			expect: &Shell{cursor: 2},
+			expect: &Shell{current: 2},
 		},
 		"cword": {
-			expect: &Shell{cursor: 1},
+			expect: &Shell{current: 1},
 			env:    map[string]string{"COMP_CWORD": "1"},
 		},
 		"cword error": {
@@ -62,25 +62,25 @@ func TestNewShell(t *testing.T) {
 
 func TestArgs(t *testing.T) {
 	for name, testcase := range map[string]struct {
-		expect *gomplete.Args
-		args   []string
-		cursor int
+		expect  *gomplete.Args
+		args    []string
+		current int
 	}{
 		"right": {
-			expect: gomplete.NewArgs([]string{"command", "foo", "bar", "baz"}).Next(),
-			args:   []string{"command", "foo", "bar", "baz"},
-			cursor: 3,
+			expect:  gomplete.NewArgs([]string{"command", "foo", "bar", "baz"}).Next(),
+			args:    []string{"command", "foo", "bar", "baz"},
+			current: 3,
 		},
 		"middle": {
-			expect: gomplete.NewArgs([]string{"command", "foo", "bar"}).Next(),
-			args:   []string{"command", "foo", "bar", "baz"},
-			cursor: 2,
+			expect:  gomplete.NewArgs([]string{"command", "foo", "bar"}).Next(),
+			args:    []string{"command", "foo", "bar", "baz"},
+			current: 2,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			shell := Shell{
 				ShellConfig: &gomplete.ShellConfig{Args: testcase.args},
-				cursor:      testcase.cursor,
+				current:     testcase.current,
 			}
 			actual := shell.Args()
 			if actual == nil {

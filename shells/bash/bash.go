@@ -27,7 +27,7 @@ var (
 // Shell is the implementation of gomplete.Shell for bash.
 type Shell struct {
 	*gomplete.ShellConfig
-	cursor int
+	current int
 }
 
 func init() {
@@ -53,23 +53,23 @@ func NewShell(config *gomplete.ShellConfig) (gomplete.Shell, error) {
 }
 
 func newShell(config *gomplete.ShellConfig) (*Shell, error) {
-	cursor := len(config.Args) - 1
+	current := len(config.Args) - 1
 	if v, ok := config.Env["COMP_CWORD"]; ok {
 		cword, err := strconv.Atoi(v)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
-		cursor = cword
+		current = cword
 	}
 	return &Shell{
 		ShellConfig: config,
-		cursor:      cursor,
+		current:     current,
 	}, nil
 }
 
 // Args returns returns command-line arguments to complete.
 func (s *Shell) Args() *gomplete.Args {
-	return gomplete.NewArgs(s.ShellConfig.Args[:s.cursor+1]).Next()
+	return gomplete.NewArgs(s.ShellConfig.Args[:s.current+1]).Next()
 }
 
 // FormatReply returns reply keys joined by newline.
