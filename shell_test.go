@@ -35,9 +35,7 @@ func TestRegisterShell(t *testing.T) {
 		unregisterAllShells()
 		for _, name := range []string{"foo", "bar", "baz"} {
 			t.Run(name, func(t *testing.T) {
-				if err := registerTestShell(name); err != nil {
-					t.Error(err)
-				}
+				registerTestShell(name)
 				if _, ok := shells[name]; !ok {
 					t.Errorf("%q is not registered", name)
 				}
@@ -51,27 +49,29 @@ func TestRegisterShell(t *testing.T) {
 		}
 	})
 	t.Run("nil", func(t *testing.T) {
-		if err := RegisterShell("nil", nil); err == nil {
-			t.Error("must returns an error")
-		}
+		defer func() {
+			if err := recover(); err == nil {
+				t.Error("must returns an error")
+			}
+		}()
+		RegisterShell("nil", nil)
 	})
 	t.Run("duplicated", func(t *testing.T) {
+		defer func() {
+			if err := recover(); err == nil {
+				t.Error("must returns an error")
+			}
+		}()
 		unregisterAllShells()
-		if err := registerTestShell("test"); err != nil {
-			t.Error(err)
-		}
-		if err := registerTestShell("test"); err == nil {
-			t.Error("must returns an error")
-		}
+		registerTestShell("test")
+		registerTestShell("test")
 	})
 }
 
 func TestNewShell(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		unregisterAllShells()
-		if err := registerTestShell("test"); err != nil {
-			t.Error(err)
-		}
+		registerTestShell("test")
 		shell, err := NewShell("test", ShellConfig{
 			CommandName: "test",
 		})
@@ -97,25 +97,23 @@ func TestNewShell(t *testing.T) {
 	})
 	t.Run("failed to initialize", func(t *testing.T) {
 		unregisterAllShells()
-		if err := registerErrorShell("test"); err != nil {
-			t.Error(err)
-		}
+		registerErrorShell("test")
 		if _, err := NewShell("test", ShellConfig{}); err == nil {
 			t.Error("must return nil")
 		}
 	})
 }
 
-func registerTestShell(name string) error {
-	return errors.WithStack(RegisterShell(name, func(config ShellConfig) (Shell, error) {
+func registerTestShell(name string) {
+	RegisterShell(name, func(config ShellConfig) (Shell, error) {
 		return &testShell{config}, nil
-	}))
+	})
 }
 
-func registerErrorShell(name string) error {
-	return errors.WithStack(RegisterShell(name, func(ShellConfig) (Shell, error) {
+func registerErrorShell(name string) {
+	RegisterShell(name, func(ShellConfig) (Shell, error) {
 		return nil, errors.New("this constructor always return an error")
-	}))
+	})
 }
 
 func unregisterAllShells() {

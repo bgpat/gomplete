@@ -29,9 +29,7 @@ type Shell struct {
 }
 
 func init() {
-	if err := gomplete.RegisterShell("bash", NewShell); err != nil {
-		panic(err)
-	}
+	gomplete.RegisterShell("bash", NewShell)
 
 	funcMap = template.FuncMap{
 		"sanitize": func(str string) string {
@@ -69,9 +67,6 @@ func (s *Shell) FormatReply(reply gomplete.Reply, w io.Writer) error {
 
 // OutputScript returns the shell script to parse replies.
 func (s *Shell) OutputScript(w io.Writer) error {
-	t, err := template.New(s.CommandName).Funcs(funcMap).Parse(scriptTemplate)
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	t := template.Must(template.New(s.CommandName).Funcs(funcMap).Parse(scriptTemplate))
 	return errors.WithStack(t.Execute(w, s))
 }

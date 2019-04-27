@@ -36,18 +36,18 @@ type ShellConfig struct {
 }
 
 // RegisterShell makes a shell implementation available by the provided name.
-// If RegisterShell is called twice with the same name or if constructor is nil, it returns an error.
-func RegisterShell(name string, constructor func(config ShellConfig) (Shell, error)) error {
+// If RegisterShell is called twice with the same name or if constructor is nil, it panics.
+func RegisterShell(name string, constructor func(config ShellConfig) (Shell, error)) {
 	shellsMu.Lock()
 	defer shellsMu.Unlock()
 	if constructor == nil {
-		return errors.New("shell is nil")
+		panic(errors.New("shell is nil"))
 	}
 	if _, dup := shells[name]; dup {
-		return fmt.Errorf("%q is already registered", name)
+		panic(fmt.Errorf("%q is already registered", name))
 	}
 	shells[name] = constructor
-	return nil
+	return
 }
 
 // Shells returns a list of the names of the registered shells.
