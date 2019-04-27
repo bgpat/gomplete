@@ -2,7 +2,7 @@ package gomplete
 
 import "context"
 
-// Completion is the interface has the completion infromation.
+// Completion is the interface has the completion information.
 type Completion interface {
 	// Complete returns the command line completion reply from args.
 	Complete(ctx context.Context, args *Args) Reply
