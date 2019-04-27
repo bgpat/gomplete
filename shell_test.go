@@ -3,6 +3,7 @@ package gomplete
 import (
 	"bytes"
 	"io"
+	"os"
 	"reflect"
 	"sort"
 	"strconv"
@@ -121,4 +122,58 @@ func unregisterAllShells() {
 	shellsMu.Lock()
 	shells = make(map[string]func(*ShellConfig) (Shell, error))
 	shellsMu.Unlock()
+}
+
+func TestNewShellConfig(t *testing.T) {
+	for name, testcase := range map[string]struct {
+		expect *ShellConfig
+		args   []string
+	}{
+		"output script": {
+			expect: &ShellConfig{
+				CommandName:     "foo",
+				CompleteCommand: []string{"/path/to/foo", "bar", "baz"},
+				Env:             map[string]string{},
+				ShellName:       "sh",
+			},
+			args: []string{"/path/to/foo", "bar", "baz"},
+		},
+		"comlete": {
+			expect: &ShellConfig{
+				CommandName:     "foo",
+				CompleteCommand: []string{"foo", "bar", "baz"},
+				Args:            []string{"foo", "hoge", "fuga", "piyo"},
+				Env:             map[string]string{},
+				ShellName:       "sh",
+			},
+			args: []string{"foo", "bar", "baz", "--", "foo", "hoge", "fuga", "piyo"},
+		},
+		"no args": {
+			expect: &ShellConfig{
+				ShellName: "sh",
+				Env:       map[string]string{},
+			},
+		},
+		"env": {
+			expect: &ShellConfig{
+				ShellName: "sh",
+				Env: map[string]string{
+					"SHELL": "/bin/sh",
+					"LANC":  "C",
+				},
+			},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			os.Clearenv()
+			os.Args = testcase.args
+			for k, v := range testcase.expect.Env {
+				os.Setenv(k, v)
+			}
+			actual := NewShellConfig("sh")
+			if !reflect.DeepEqual(testcase.expect, actual) {
+				t.Errorf("expect %#v, but actual %#v", testcase.expect, actual)
+			}
+		})
+	}
 }
