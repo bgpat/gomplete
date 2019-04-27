@@ -30,13 +30,8 @@ func main() {
 			},
 		},
 	}
-	cfg := gomplete.ShellConfig{
-		CommandName:     "examples",
-		CompleteCommand: "examples -completion",
-	}
 	flag.Var(&plugins.Flag{
 		Completion: &comp,
-		Config:     &cfg,
 	}, "completion", "output completion script")
 	flag.Parse()
 }

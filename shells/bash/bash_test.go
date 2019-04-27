@@ -13,14 +13,14 @@ import (
 func TestRegisterShell(t *testing.T) {
 	_, err := gomplete.NewShell(&gomplete.ShellConfig{ShellName: "bash"})
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 
 func TestNewShell(t *testing.T) {
-	shell, err := NewShell(&gomplete.ShellConfig{})
+	shell, err := NewShell(&gomplete.ShellConfig{ShellName: "bash"})
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	if shell == nil {
 		t.Error("shell is nil")
@@ -59,7 +59,7 @@ func TestFormatReply(t *testing.T) {
 	}
 	var buf bytes.Buffer
 	if err := shell.FormatReply(reply, &buf); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	expect := "bar\nbaz\nfoo"
 	actual := buf.String()
@@ -83,11 +83,11 @@ func TestOutputScript(t *testing.T) {
 		t.Run(cfg.CommandName, func(t *testing.T) {
 			shell, err := newShell(&cfg)
 			if err != nil {
-				t.Error(shell)
+				t.Fatal(err)
 			}
 			var buf bytes.Buffer
 			if err := shell.OutputScript(&buf); err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			cupaloy.SnapshotT(t, buf.String())
 		})

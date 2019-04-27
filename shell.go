@@ -95,6 +95,10 @@ func NewShellConfig(shell string) *ShellConfig {
 		}
 	}
 
+	if cfg.CompleteCommand == nil {
+		cfg.CompleteCommand = os.Args
+	}
+
 	cfg.Env = parseEnv()
 
 	return &cfg
