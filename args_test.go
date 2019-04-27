@@ -20,15 +20,15 @@ func TestNewArgs(t *testing.T) {
 
 func TestArgsCurrent(t *testing.T) {
 	for expect, args := range map[string]Args{
-		"zero": Args{
+		"zero": {
 			words: []string{"zero", "one", "two"},
 			index: 0,
 		},
-		"one": Args{
+		"one": {
 			words: []string{"zero", "one", "two"},
 			index: 1,
 		},
-		"two": Args{
+		"two": {
 			words: []string{"zero", "one", "two"},
 			index: 2,
 		},
@@ -44,19 +44,19 @@ func TestArgsCurrent(t *testing.T) {
 
 func TestArgsNext(t *testing.T) {
 	for i, args := range map[int]Args{
-		1: Args{
+		1: {
 			words: []string{"zero", "one", "two"},
 			index: 0,
 		},
-		2: Args{
+		2: {
 			words: []string{"zero", "one", "two"},
 			index: 1,
 		},
-		-1: Args{
+		-1: {
 			words: []string{"zero", "one", "two"},
 			index: 2,
 		},
-		-2: Args{
+		-2: {
 			words: []string{},
 			index: 0,
 		},
