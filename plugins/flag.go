@@ -16,7 +16,7 @@ import (
 // Flag is a implementation for flag.Value.
 type Flag struct {
 	Completion gomplete.Completion
-	Config     gomplete.ShellConfig
+	Config     *gomplete.ShellConfig
 }
 
 // String returns empty string.

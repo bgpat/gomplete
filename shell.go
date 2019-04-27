@@ -10,7 +10,7 @@ import (
 
 var (
 	shellsMu sync.RWMutex
-	shells   = make(map[string]func(ShellConfig) (Shell, error))
+	shells   = make(map[string]func(*ShellConfig) (Shell, error))
 )
 
 // Shell is the shell completion interface.
@@ -37,7 +37,7 @@ type ShellConfig struct {
 
 // RegisterShell makes a shell implementation available by the provided name.
 // If RegisterShell is called twice with the same name or if constructor is nil, it panics.
-func RegisterShell(name string, constructor func(config ShellConfig) (Shell, error)) {
+func RegisterShell(name string, constructor func(config *ShellConfig) (Shell, error)) {
 	shellsMu.Lock()
 	defer shellsMu.Unlock()
 	if constructor == nil {
@@ -61,7 +61,7 @@ func Shells() []string {
 }
 
 // NewShell creates a new Shell instances by the provided name.
-func NewShell(name string, config ShellConfig) (Shell, error) {
+func NewShell(name string, config *ShellConfig) (Shell, error) {
 	shellsMu.RLock()
 	defer shellsMu.RUnlock()
 	constructor := shells[name]

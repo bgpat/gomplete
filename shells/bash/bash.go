@@ -25,7 +25,7 @@ var (
 
 // Shell is the implementation of gomplete.Shell for bash.
 type Shell struct {
-	gomplete.ShellConfig
+	*gomplete.ShellConfig
 }
 
 func init() {
@@ -39,11 +39,11 @@ func init() {
 }
 
 // NewShell returns a shell instance from shell config.
-func NewShell(config gomplete.ShellConfig) (gomplete.Shell, error) {
+func NewShell(config *gomplete.ShellConfig) (gomplete.Shell, error) {
 	return newShell(config)
 }
 
-func newShell(config gomplete.ShellConfig) (*Shell, error) {
+func newShell(config *gomplete.ShellConfig) (*Shell, error) {
 	return &Shell{
 		ShellConfig: config,
 	}, nil

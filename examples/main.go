@@ -36,7 +36,7 @@ func main() {
 	}
 	flag.Var(&plugins.Flag{
 		Completion: &comp,
-		Config:     cfg,
+		Config:     &cfg,
 	}, "completion", "output completion script")
 	flag.Parse()
 }

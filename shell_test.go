@@ -12,7 +12,7 @@ import (
 )
 
 type testShell struct {
-	ShellConfig
+	*ShellConfig
 }
 
 func (s *testShell) Args() *Args {
@@ -72,7 +72,7 @@ func TestNewShell(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		unregisterAllShells()
 		registerTestShell("test")
-		shell, err := NewShell("test", ShellConfig{
+		shell, err := NewShell("test", &ShellConfig{
 			CommandName: "test",
 		})
 		if err != nil {
@@ -91,33 +91,33 @@ func TestNewShell(t *testing.T) {
 	})
 	t.Run("unknown shell", func(t *testing.T) {
 		unregisterAllShells()
-		if _, err := NewShell("test", ShellConfig{}); err == nil {
+		if _, err := NewShell("test", &ShellConfig{}); err == nil {
 			t.Error("must return nil because test shell is not registered")
 		}
 	})
 	t.Run("failed to initialize", func(t *testing.T) {
 		unregisterAllShells()
 		registerErrorShell("test")
-		if _, err := NewShell("test", ShellConfig{}); err == nil {
+		if _, err := NewShell("test", &ShellConfig{}); err == nil {
 			t.Error("must return nil")
 		}
 	})
 }
 
 func registerTestShell(name string) {
-	RegisterShell(name, func(config ShellConfig) (Shell, error) {
+	RegisterShell(name, func(config *ShellConfig) (Shell, error) {
 		return &testShell{config}, nil
 	})
 }
 
 func registerErrorShell(name string) {
-	RegisterShell(name, func(ShellConfig) (Shell, error) {
+	RegisterShell(name, func(*ShellConfig) (Shell, error) {
 		return nil, errors.New("this constructor always return an error")
 	})
 }
 
 func unregisterAllShells() {
 	shellsMu.Lock()
-	shells = make(map[string]func(ShellConfig) (Shell, error))
+	shells = make(map[string]func(*ShellConfig) (Shell, error))
 	shellsMu.Unlock()
 }

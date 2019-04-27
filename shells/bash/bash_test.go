@@ -11,14 +11,14 @@ import (
 )
 
 func TestRegisterShell(t *testing.T) {
-	_, err := gomplete.NewShell("bash", gomplete.ShellConfig{})
+	_, err := gomplete.NewShell("bash", &gomplete.ShellConfig{})
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestNewShell(t *testing.T) {
-	shell, err := NewShell(gomplete.ShellConfig{})
+	shell, err := NewShell(&gomplete.ShellConfig{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,7 +30,7 @@ func TestNewShell(t *testing.T) {
 func TestArgs(t *testing.T) {
 	testcase := []string{"command", "foo", "bar", "baz"}
 	shell := Shell{
-		gomplete.ShellConfig{
+		&gomplete.ShellConfig{
 			Args: testcase,
 		},
 	}
@@ -81,7 +81,7 @@ func TestOutputScript(t *testing.T) {
 	} {
 		cfg := cfg
 		t.Run(cfg.CommandName, func(t *testing.T) {
-			shell, err := newShell(cfg)
+			shell, err := newShell(&cfg)
 			if err != nil {
 				t.Error(shell)
 			}
