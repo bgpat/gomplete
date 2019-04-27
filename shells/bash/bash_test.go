@@ -29,10 +29,9 @@ func TestNewShell(t *testing.T) {
 
 func TestArgs(t *testing.T) {
 	testcase := []string{"command", "foo", "bar", "baz"}
-	shell := Shell{
-		&gomplete.ShellConfig{
-			Args: testcase,
-		},
+	shell, err := newShell(&gomplete.ShellConfig{Args: testcase})
+	if err != nil {
+		t.Fatal(err)
 	}
 	args := shell.Args()
 	if args == nil {

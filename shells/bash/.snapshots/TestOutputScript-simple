@@ -1,6 +1,6 @@
 _simple_completion() {
 	IFS=$'\n'
-	COMPREPLY=( $("simple" "-completion" -- "${COMP_WORDS[@]}") )
+	COMPREPLY=( $( COMP_CWORD=$COMP_CWORD "simple" "-completion" -- "${COMP_WORDS[@]}") )
 }
 complete -F _simple_completion simple
 

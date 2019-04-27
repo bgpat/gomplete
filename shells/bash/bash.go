@@ -14,7 +14,7 @@ import (
 
 const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
 	IFS=$'\n'
-	COMPREPLY=( $({{join .CompleteCommand}} -- "${COMP_WORDS[@]}") )
+	COMPREPLY=( $( COMP_CWORD=$COMP_CWORD {{join .CompleteCommand}} -- "${COMP_WORDS[@]}") )
 }
 complete -F _{{sanitize .CommandName}}_completion {{.CommandName}}
 `
@@ -27,6 +27,7 @@ var (
 // Shell is the implementation of gomplete.Shell for bash.
 type Shell struct {
 	*gomplete.ShellConfig
+	cursor int
 }
 
 func init() {
@@ -52,14 +53,23 @@ func NewShell(config *gomplete.ShellConfig) (gomplete.Shell, error) {
 }
 
 func newShell(config *gomplete.ShellConfig) (*Shell, error) {
+	cursor := len(config.Args) - 1
+	if v, ok := config.Env["COMP_CWORD"]; ok {
+		cword, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		cursor = cword
+	}
 	return &Shell{
 		ShellConfig: config,
+		cursor:      cursor,
 	}, nil
 }
 
 // Args returns returns command-line arguments to complete.
 func (s *Shell) Args() *gomplete.Args {
-	return gomplete.NewArgs(s.ShellConfig.Args).Next()
+	return gomplete.NewArgs(s.ShellConfig.Args[:s.cursor+1]).Next()
 }
 
 // FormatReply returns reply keys joined by newline.
