@@ -17,15 +17,15 @@ func main() {
 			Sub: &gomplete.Union{
 				&gomplete.Command{
 					Name:        "hoge",
-					Description: "hoge",
+					Description: "description of hoge",
 				},
 				&gomplete.Command{
 					Name:        "fuga",
-					Description: "fuga",
+					Description: "description of fuga",
 				},
 				&gomplete.Command{
 					Name:        "piyo",
-					Description: "piyo",
+					Description: "description of piyo",
 				},
 			},
 		},
