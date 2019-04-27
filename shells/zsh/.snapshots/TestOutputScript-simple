@@ -1,0 +1,10 @@
+_simple() {
+	IFS=$'\n'
+	local -a completion
+	completion=( $( CURRENT=$CURRENT "simple" "-completion" -- "${words[@]}" ) )
+	if [ ${#completion} -gt 0 ]; then
+		_values simple "${completion[@]}"
+	fi
+}
+compdef _simple simple
+

@@ -1,0 +1,10 @@
+_kebab-case() {
+	IFS=$'\n'
+	local -a completion
+	completion=( $( CURRENT=$CURRENT "kebab-case" "-completion" -- "${words[@]}" ) )
+	if [ ${#completion} -gt 0 ]; then
+		_values kebab-case "${completion[@]}"
+	fi
+}
+compdef _kebab-case kebab-case
+
