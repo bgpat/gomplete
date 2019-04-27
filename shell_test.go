@@ -72,18 +72,19 @@ func TestNewShell(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		unregisterAllShells()
 		registerTestShell("test")
-		shell, err := NewShell("test", &ShellConfig{
+		shell, err := NewShell(&ShellConfig{
 			CommandName: "test",
+			ShellName:   "test",
 		})
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if shell == nil {
-			t.Error("shell is nil")
+			t.Fatal("shell is nil")
 		}
 		var buf bytes.Buffer
 		if err := shell.OutputScript(&buf); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if buf.String() != "test" {
 			t.Error("not match to the testcase")
@@ -91,14 +92,14 @@ func TestNewShell(t *testing.T) {
 	})
 	t.Run("unknown shell", func(t *testing.T) {
 		unregisterAllShells()
-		if _, err := NewShell("test", &ShellConfig{}); err == nil {
+		if _, err := NewShell(&ShellConfig{ShellName: "test"}); err == nil {
 			t.Error("must return nil because test shell is not registered")
 		}
 	})
 	t.Run("failed to initialize", func(t *testing.T) {
 		unregisterAllShells()
 		registerErrorShell("test")
-		if _, err := NewShell("test", &ShellConfig{}); err == nil {
+		if _, err := NewShell(&ShellConfig{ShellName: "test"}); err == nil {
 			t.Error("must return nil")
 		}
 	})

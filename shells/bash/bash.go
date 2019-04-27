@@ -4,6 +4,7 @@ import (
 	"io"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -13,7 +14,7 @@ import (
 
 const scriptTemplate = `_{{sanitize .CommandName}}_completion() {
 	IFS=$'\n'
-	COMPREPLY=( $({{.CompleteCommand}} {{.ShellName}} -- "${COMP_WORDS[@]}") )
+	COMPREPLY=( $({{join .CompleteCommand}} -- "${COMP_WORDS[@]}") )
 }
 complete -F _{{sanitize .CommandName}}_completion {{.CommandName}}
 `
@@ -34,6 +35,13 @@ func init() {
 	funcMap = template.FuncMap{
 		"sanitize": func(str string) string {
 			return sanitizeRe.ReplaceAllString(str, "_")
+		},
+		"join": func(src []string) string {
+			tmp := make([]string, 0, len(src))
+			for _, s := range src {
+				tmp = append(tmp, strconv.Quote(s))
+			}
+			return strings.Join(tmp, " ")
 		},
 	}
 }

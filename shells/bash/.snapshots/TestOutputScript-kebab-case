@@ -1,6 +1,6 @@
 _kebab_case_completion() {
 	IFS=$'\n'
-	COMPREPLY=( $(kebab-case -completion --  -- "${COMP_WORDS[@]}") )
+	COMPREPLY=( $("kebab-case" "-completion" -- "${COMP_WORDS[@]}") )
 }
 complete -F _kebab_case_completion kebab-case
 

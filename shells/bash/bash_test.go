@@ -11,7 +11,7 @@ import (
 )
 
 func TestRegisterShell(t *testing.T) {
-	_, err := gomplete.NewShell("bash", &gomplete.ShellConfig{})
+	_, err := gomplete.NewShell(&gomplete.ShellConfig{ShellName: "bash"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -72,11 +72,11 @@ func TestOutputScript(t *testing.T) {
 	for _, cfg := range []gomplete.ShellConfig{
 		{
 			CommandName:     "simple",
-			CompleteCommand: "simple -completion --",
+			CompleteCommand: []string{"simple", "-completion"},
 		},
 		{
 			CommandName:     "kebab-case",
-			CompleteCommand: "kebab-case -completion --",
+			CompleteCommand: []string{"kebab-case", "-completion"},
 		},
 	} {
 		cfg := cfg
