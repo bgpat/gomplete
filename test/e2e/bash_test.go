@@ -40,15 +40,21 @@ func TestBash(t *testing.T) {
 	if err := writeAndWait(ctx, tty, "examples "); err != nil {
 		t.Fatal(err)
 	}
-	tty.WriteString("\t")
+	if _, err := tty.WriteString("\t"); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := waitString(ctx, tty, "foo"); err != nil {
 		t.Fatal(err)
 	}
-	tty.WriteString("\t")
+	if _, err := tty.WriteString("\t"); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := waitString(ctx, tty, "bar"); err != nil {
 		t.Fatal(err)
 	}
-	tty.WriteString("\t\t")
+	if _, err := tty.WriteString("\t\t"); err != nil {
+		t.Fatal(err)
+	}
 	reply, err := waitString(ctx, tty, "examples foo bar")
 	if err != nil {
 		t.Fatal(err)

@@ -10,7 +10,9 @@ import (
 )
 
 func writeAndWait(ctx context.Context, r io.ReadWriter, s string) error {
-	io.WriteString(r, s)
+	if _, err := io.WriteString(r, s); err != nil {
+		return errors.WithStack(err)
+	}
 	_, err := waitString(ctx, r, s)
 	return errors.WithStack(err)
 }
