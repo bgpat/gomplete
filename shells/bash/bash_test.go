@@ -78,11 +78,10 @@ func TestArgs(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			shell, err := newShell(&gomplete.ShellConfig{Args: testcase.args})
-			if err != nil {
-				t.Fatal(err)
+			shell := Shell{
+				ShellConfig: &gomplete.ShellConfig{Args: testcase.args},
+				cursor:      testcase.cursor,
 			}
-			shell.cursor = testcase.cursor
 			actual := shell.Args()
 			if actual == nil {
 				t.Error("args is nil")
