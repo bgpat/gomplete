@@ -11,6 +11,7 @@ import (
 
 	"github.com/bgpat/gomplete"
 	_ "github.com/bgpat/gomplete/shells/bash" // support bash
+	_ "github.com/bgpat/gomplete/shells/zsh"  // support zsh
 )
 
 // Flag is a implementation for flag.Value.
