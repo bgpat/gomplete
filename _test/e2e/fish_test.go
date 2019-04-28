@@ -31,11 +31,11 @@ func TestFish(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "fish")
+	cmd.Dir = dir
 	cmd.Env = []string{
-		"PATH=" + dir,
-		"TERM=vt100",
+		"PATH=" + dir + ":" + os.Getenv("PATH"),
+		"TERM=xterm",
 	}
-	cmd.Env = append(cmd.Env, os.Environ()...)
 	tty, err := pty.Start(cmd)
 	if err != nil {
 		t.Fatal(err)
