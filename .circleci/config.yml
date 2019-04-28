@@ -47,7 +47,7 @@ jobs:
       E2E_TARGET: bash
   e2e-zsh:
     docker:
-    - image: bgpat/golang-zsh:latest
+    - image: bgpat/golang-zsh:1.12
     executor:
       name: go/init
     steps:
