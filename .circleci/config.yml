@@ -1,21 +1,65 @@
-version: 2
+version: "2.1"
+orbs:
+  go:
+    executors:
+      init:
+        docker:
+        - image: circleci/golang:1.12
+        environment:
+          GO111MODULE: "on"
+        working_directory: /go/src/github.com/bgpat/gomplete
+    commands:
+      mod:
+        steps:
+        - restore_cache:
+            keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+        - run: go mod vendor
+        - save_cache:
+            key: go-mod-v1-{{ checksum "go.sum" }}
+            paths:
+            - /go/src/github.com/bgpat/gomplete/vendor
+      test:
+        steps:
+        - run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+        - run: bash <(curl -s https://codecov.io/bash)
+      e2e:
+        steps:
+        - run: go test -v -race -tags=${E2E_TARGET} ./_test/e2e/...
 jobs:
-  build:
-    docker:
-    - image: circleci/golang:1.12 #
-      environment:
-        GO111MODULE: "on"
-    working_directory: /go/src/github.com/bgpat/gomplete
+  test:
+    executor:
+      name: go/init
     steps:
     - checkout
-    - restore_cache:
-        keys:
-        - go-mod-v1-{{ checksum "go.sum" }}
-    - run: go mod vendor
-    - save_cache:
-        key: go-mod-v1-{{ checksum "go.sum" }}
-        paths:
-        - "/go/src/github.com/bgpat/gomplete/vendor"
-    - run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-    - run: bash <(curl -s https://codecov.io/bash)
-    - run: go test -v -race ./_test/e2e/...
+    - go/mod
+    - go/test
+  e2e-bash:
+    docker:
+    - image: circleci/golang:1.12
+    executor:
+      name: go/init
+    steps:
+    - checkout
+    - go/mod
+    - go/e2e
+    environment:
+      E2E_TARGET: bash
+  e2e-zsh:
+    docker:
+    - image: bgpat/golang-zsh:latest
+    executor:
+      name: go/init
+    steps:
+    - checkout
+    - go/mod
+    - go/e2e
+    environment:
+      E2E_TARGET: zsh
+workflows:
+  version: 2
+  test:
+    jobs:
+    - test
+    - e2e-bash
+    - e2e-zsh
