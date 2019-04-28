@@ -1,0 +1,16 @@
+function __fish_kebab-case_needs_command
+	return 0
+end
+
+function __fish_kebab-case_using_command
+	set -l words (string split \n -- (commandline -opc))
+	set -l word (commandline -ot)
+	set -lx cword (count (commandline -o))
+	if [ -z (commandline -ct) ]
+		set cword (math $cword + 1)
+	end
+	"kebab-case" "-completion" -- $words "$word"
+end
+
+complete -x -c kebab-case -n "__fish_kebab-case_needs_command" -a "(__fish_kebab-case_using_command)"
+
