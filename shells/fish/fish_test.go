@@ -36,8 +36,13 @@ func TestNewShell(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			os.Clearenv()
 			for k, v := range testcase.env {
+				if prev, ok := os.LookupEnv(k); ok {
+					os.Unsetenv(k)
+					defer os.Setenv(k, prev)
+				} else {
+					defer os.Unsetenv(k)
+				}
 				os.Setenv(k, v)
 			}
 			cfg := gomplete.NewShellConfig("fish")
