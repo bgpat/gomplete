@@ -12,5 +12,5 @@ function __fish_kebab-case_using_command
 	"kebab-case" "-completion" -- $words "$word"
 end
 
-complete -x -c kebab-case -n "__fish_kebab-case_needs_command" -a "(__fish_kebab-case_using_command)"
+complete -x -c "kebab-case" -n "__fish_kebab-case_needs_command" -a "(__fish_kebab-case_using_command)"
 

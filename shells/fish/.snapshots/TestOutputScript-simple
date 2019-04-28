@@ -12,5 +12,5 @@ function __fish_simple_using_command
 	"simple" "-completion" -- $words "$word"
 end
 
-complete -x -c simple -n "__fish_simple_needs_command" -a "(__fish_simple_using_command)"
+complete -x -c "simple" -n "__fish_simple_needs_command" -a "(__fish_simple_using_command)"
 
