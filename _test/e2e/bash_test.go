@@ -1,3 +1,5 @@
+// +build !zsh,!fish
+
 package e2e
 
 import (
