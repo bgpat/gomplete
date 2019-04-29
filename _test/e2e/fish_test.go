@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/kr/pty"
 )
@@ -32,7 +31,7 @@ func TestFish(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "fish")
 	cmd.Dir = dir
@@ -72,8 +71,7 @@ func TestFish(t *testing.T) {
 	if _, err := tty.WriteString("\t\t"); err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("reply: %q", reply)
-	reply, err = waitString(ctx, tty, "\r\n")
+	reply, err = waitString(ctx, tty, "hoge")
 	if err != nil {
 		t.Fatal(err)
 	}
