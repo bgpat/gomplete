@@ -1,6 +1,7 @@
 package bash
 
 import (
+	"fmt"
 	"io"
 	"regexp"
 	"sort"
@@ -88,4 +89,9 @@ func (s *Shell) FormatReply(reply gomplete.Reply, w io.Writer) error {
 func (s *Shell) OutputScript(w io.Writer) error {
 	t := template.Must(template.New(s.CommandName).Funcs(funcMap).Parse(scriptTemplate))
 	return errors.WithStack(t.Execute(w, s))
+}
+
+// Usage returns the usage of the shell script.
+func (s *Shell) Usage(cmdline string) string {
+	return fmt.Sprintf("source <(%s)", cmdline)
 }
