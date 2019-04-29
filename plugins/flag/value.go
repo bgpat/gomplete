@@ -40,7 +40,7 @@ func (v *Value) Set(name string) error {
 
 	if len(cfg.Args) == 0 {
 		if isatty.IsTerminal(os.Stdout.Fd()) {
-			fmt.Println(shell.Usage(strings.Join(os.Args, " ")))
+			fmt.Println("usage:", shell.Usage(strings.Join(os.Args, " ")))
 			os.Exit(1)
 			return nil
 		}
