@@ -9,8 +9,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/bgpat/gomplete"
 	"github.com/pkg/errors"
+
+	"github.com/bgpat/gomplete"
 )
 
 const scriptTemplate = `_{{sanitize .CommandName}}() {
