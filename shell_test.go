@@ -31,6 +31,10 @@ func (s *testShell) OutputScript(w io.Writer) error {
 	return errors.WithStack(err)
 }
 
+func (s *testShell) Usage(cmdline string) string {
+	return cmdline
+}
+
 func TestRegisterShell(t *testing.T) {
 	t.Run("register", func(t *testing.T) {
 		unregisterAllShells()

@@ -26,6 +26,9 @@ type Shell interface {
 
 	// OutputScript outputs the shell script to parse the reply and register the completion.
 	OutputScript(w io.Writer) error
+
+	// Usage returns how to load the completion script.
+	Usage(cmdline string) string
 }
 
 // ShellConfig is the configuration for shell.

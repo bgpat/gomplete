@@ -140,3 +140,12 @@ func TestOutputScript(t *testing.T) {
 		})
 	}
 }
+
+func TestUsage(t *testing.T) {
+	shell := Shell{}
+	expect := "source (cmd -completion=fish | psub)"
+	actual := shell.Usage("cmd -completion=fish")
+	if actual != expect {
+		t.Errorf("expect %q, but actual %q", expect, actual)
+	}
+}
