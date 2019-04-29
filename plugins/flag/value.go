@@ -33,24 +33,20 @@ func (v *Value) Set(name string) error {
 	}
 
 	cfg := gomplete.NewShellConfig(name)
-
-	if len(cfg.Args) == 0 {
-		if isatty.IsTerminal(os.Stdout.Fd()) {
-			fmt.Printf("usage: source <(%s)\n", strings.Join(os.Args, " "))
-			os.Exit(1)
-			return nil
-		}
-		shell, err := gomplete.NewShell(cfg)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		return errors.WithStack(shell.OutputScript(os.Stdout))
-	}
-
 	shell, err := gomplete.NewShell(cfg)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	if len(cfg.Args) == 0 {
+		if isatty.IsTerminal(os.Stdout.Fd()) {
+			fmt.Println(shell.Usage(strings.Join(os.Args, " ")))
+			os.Exit(1)
+			return nil
+		}
+		return errors.WithStack(shell.OutputScript(os.Stdout))
+	}
+
 	reply := v.Completion.Complete(context.Background(), shell.Args())
 	return errors.WithStack(shell.FormatReply(reply, os.Stdout))
 }

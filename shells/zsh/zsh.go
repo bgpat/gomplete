@@ -102,3 +102,8 @@ func (s *Shell) OutputScript(w io.Writer) error {
 	t := template.Must(template.New(s.CommandName).Funcs(funcMap).Parse(scriptTemplate))
 	return errors.WithStack(t.Execute(w, s))
 }
+
+// Usage returns the usage of the shell script.
+func (s *Shell) Usage(cmdline string) string {
+	return fmt.Sprintf("source <(%s)", cmdline)
+}
