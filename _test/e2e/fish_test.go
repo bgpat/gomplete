@@ -40,6 +40,9 @@ func TestFish(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := pty.Setsize(tty, &pty.Winsize{Rows: 20, Cols: 80}); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := tty.WriteString("source (examples -completion=fish | psub)\n"); err != nil {
 		t.Fatal(err)
 	}
