@@ -71,8 +71,7 @@ func TestFish(t *testing.T) {
 	if _, err := tty.WriteString("\t\t"); err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("reply: %q", reply)
-	reply, err = waitString(ctx, tty, "piyo")
+	reply, err = waitString(ctx, tty, "hoge")
 	if err != nil {
 		t.Fatal(err)
 	}
