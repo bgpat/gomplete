@@ -20,7 +20,11 @@ func TestFish(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() {
+		if err := os.RemoveAll(dir); err != nil {
+			t.Error(err)
+		}
+	}()
 
 	binfile := filepath.Join(dir, "examples")
 	excmd := exec.Command("go", "build", "-o", binfile, "../../examples")
