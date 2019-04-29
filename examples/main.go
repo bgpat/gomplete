@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/bgpat/gomplete"
-	"github.com/bgpat/gomplete/plugins"
+	gomplete_flag "github.com/bgpat/gomplete/plugins/flag"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 		},
 	}
 	flag.Var(
-		&plugins.Flag{
+		&gomplete_flag.Value{
 			Completion: &comp,
 			FlagName:   "completion",
 		},
