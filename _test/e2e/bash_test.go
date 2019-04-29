@@ -20,7 +20,11 @@ func TestBash(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(dir)
+	defer func() {
+		if err := os.RemoveAll(dir); err != nil {
+			t.Error(err)
+		}
+	}()
 
 	binfile := filepath.Join(dir, "examples")
 	excmd := exec.Command("go", "build", "-o", binfile, "../../examples")
@@ -45,19 +49,23 @@ func TestBash(t *testing.T) {
 	if _, err := tty.WriteString("\t"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := waitString(ctx, tty, "foo"); err != nil {
+	reply, err := waitString(ctx, tty, "foo")
+	if err != nil {
 		t.Fatal(err)
 	}
+	t.Logf("reply %q", reply)
 	if _, err := tty.WriteString("\t"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := waitString(ctx, tty, "bar"); err != nil {
+	reply, err = waitString(ctx, tty, "bar")
+	if err != nil {
 		t.Fatal(err)
 	}
+	t.Logf("reply %q", reply)
 	if _, err := tty.WriteString("\t\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err := waitString(ctx, tty, "examples foo bar")
+	reply, err = waitString(ctx, tty, "examples foo bar")
 	if err != nil {
 		t.Fatal(err)
 	}
