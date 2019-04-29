@@ -1,0 +1,16 @@
+function __fish_simple_needs_command
+	return 0
+end
+
+function __fish_simple_using_command
+	set -l words (string split \n -- (commandline -opc))
+	set -l word (commandline -ot)
+	set -lx cword (count (commandline -o))
+	if [ -z (commandline -ct) ]
+		set cword (math $cword + 1)
+	end
+	"simple" "-completion" -- $words "$word"
+end
+
+complete -x -c "simple" -n "__fish_simple_needs_command" -a "(__fish_simple_using_command)"
+
