@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const timeout = 5 * time.Second
+
 func writeAndWait(ctx context.Context, r io.ReadWriter, s string) error {
 	if _, err := io.WriteString(r, s); err != nil {
 		return errors.WithStack(err)
