@@ -10,9 +10,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/bgpat/gomplete"
-	_ "github.com/bgpat/gomplete/shells/bash" // support bash
-	_ "github.com/bgpat/gomplete/shells/fish" // support fish
-	_ "github.com/bgpat/gomplete/shells/zsh"  // support zsh
 )
 
 // Value is a implementation for flag.Value.

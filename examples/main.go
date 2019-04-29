@@ -5,6 +5,7 @@ import (
 
 	"github.com/bgpat/gomplete"
 	gomplete_flag "github.com/bgpat/gomplete/plugins/flag"
+	_ "github.com/bgpat/gomplete/shells"
 )
 
 func main() {
