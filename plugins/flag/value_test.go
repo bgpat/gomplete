@@ -11,7 +11,7 @@ func TestValueString(t *testing.T) {
 	v := Value{}
 	s := v.String()
 	if s != "" {
-		t.Errorf("expect empty string, but actual %s", s)
+		t.Errorf("want empty string, but got %s", s)
 	}
 }
 
@@ -25,7 +25,7 @@ func TestValueSet(t *testing.T) {
 			t.Fatal(err)
 		}
 		if exitCode != 1 {
-			t.Errorf("eixt code must 1, but actual %v", exitCode)
+			t.Errorf("eixt code must 1, but got %v", exitCode)
 		}
 	})
 
@@ -53,7 +53,7 @@ func TestValueSet(t *testing.T) {
 				t.Fatal(err)
 			}
 			if exitCode != 1 {
-				t.Errorf("eixt code must 1, but actual %v", exitCode)
+				t.Errorf("eixt code must 1, but got %v", exitCode)
 			}
 		})
 		t.Run("not terminal", func(t *testing.T) {
@@ -94,6 +94,6 @@ func TestValue(t *testing.T) {
 	v := Value{}
 	v.exit(1)
 	if exitCode != 1 {
-		t.Errorf("eixt code must 1, but actual %v", exitCode)
+		t.Errorf("eixt code must 1, but got %v", exitCode)
 	}
 }

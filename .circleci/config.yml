@@ -23,9 +23,9 @@ orbs:
         steps:
         - run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
         - run: bash <(curl -s https://codecov.io/bash)
-      e2e:
+      integration-test:
         steps:
-        - run: go test -v -race -tags=${E2E_TARGET} ./_test/e2e/...
+        - run: go test -v -race -tags="integration ${TARGET_SHELL}" ./shells/${TARGET_SHELL}/integration_test.go
 jobs:
   test:
     executor:
@@ -34,7 +34,7 @@ jobs:
     - checkout
     - go/mod
     - go/test
-  e2e-bash:
+  bash:
     docker:
     - image: circleci/golang:1.12
     executor:
@@ -42,10 +42,10 @@ jobs:
     steps:
     - checkout
     - go/mod
-    - go/e2e
+    - go/integration-test
     environment:
-      E2E_TARGET: bash
-  e2e-zsh:
+      TARGET_SHELL: bash
+  zsh:
     docker:
     - image: bgpat/golang-zsh:1.12
     executor:
@@ -53,10 +53,10 @@ jobs:
     steps:
     - checkout
     - go/mod
-    - go/e2e
+    - go/integration-test
     environment:
-      E2E_TARGET: zsh
-  e2e-fish:
+      TARGET_SHELL: zsh
+  fish:
     docker:
     - image: bgpat/golang-fish:1.12
     executor:
@@ -64,14 +64,14 @@ jobs:
     steps:
     - checkout
     - go/mod
-    - go/e2e
+    - go/integration-test
     environment:
-      E2E_TARGET: fish
+      TARGET_SHELL: fish
 workflows:
   version: 2
   test:
     jobs:
     - test
-    - e2e-bash
-    - e2e-zsh
-    - e2e-fish
+    - bash
+    - zsh
+    - fish

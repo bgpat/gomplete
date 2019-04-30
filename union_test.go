@@ -18,7 +18,7 @@ func TestUnionComplete(t *testing.T) {
 				&Command{Name: "bar", Description: "bar"},
 				&Command{Name: "baz", Description: "baz"},
 			},
-			expect: Reply{
+			want: Reply{
 				"foo": "foo",
 				"bar": "bar",
 				"baz": "baz",
@@ -33,7 +33,7 @@ func TestUnionComplete(t *testing.T) {
 				&Command{Name: "bar", Description: "bar"},
 				&Command{Name: "baz", Description: "baz"},
 			},
-			expect: Reply{
+			want: Reply{
 				"bar": "bar",
 				"baz": "baz",
 			},

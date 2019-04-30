@@ -21,15 +21,15 @@ func TestRegisterShell(t *testing.T) {
 func TestNewShell(t *testing.T) {
 	os.Args = []string{"/path/to/command", "-completion", "zsh", "--", "hoge", "fuga", "piyo"}
 	for name, testcase := range map[string]struct {
-		expect *Shell
-		env    map[string]string
+		want *Shell
+		env  map[string]string
 	}{
 		"no env": {
-			expect: &Shell{current: 3},
+			want: &Shell{current: 3},
 		},
 		"current": {
-			expect: &Shell{current: 2},
-			env:    map[string]string{"CURRENT": "2"},
+			want: &Shell{current: 2},
+			env:  map[string]string{"CURRENT": "2"},
 		},
 		"current error": {
 			env: map[string]string{"CURRENT": "NaN"},
@@ -41,19 +41,19 @@ func TestNewShell(t *testing.T) {
 				os.Setenv(k, v)
 			}
 			cfg := gomplete.NewShellConfig("zsh")
-			if testcase.expect != nil {
-				testcase.expect.ShellConfig = cfg
+			if testcase.want != nil {
+				testcase.want.ShellConfig = cfg
 			}
-			actual, err := NewShell(cfg)
-			if testcase.expect == nil {
+			got, err := NewShell(cfg)
+			if testcase.want == nil {
 				if err == nil {
 					t.Error("must return an error")
 				}
 			} else if err != nil {
 				t.Fatal(err)
 			}
-			if !reflect.DeepEqual(testcase.expect, actual) {
-				t.Errorf("expect %#v, actual %#v", testcase.expect, actual)
+			if !reflect.DeepEqual(testcase.want, got) {
+				t.Errorf("want %#v, got %#v", testcase.want, got)
 			}
 		})
 	}
@@ -61,17 +61,17 @@ func TestNewShell(t *testing.T) {
 
 func TestArgs(t *testing.T) {
 	for name, testcase := range map[string]struct {
-		expect  *gomplete.Args
+		want    *gomplete.Args
 		args    []string
 		current int
 	}{
 		"right": {
-			expect:  gomplete.NewArgs([]string{"command", "foo", "bar", "baz"}).Next(),
+			want:    gomplete.NewArgs([]string{"command", "foo", "bar", "baz"}).Next(),
 			args:    []string{"command", "foo", "bar", "baz"},
 			current: 4,
 		},
 		"middle": {
-			expect:  gomplete.NewArgs([]string{"command", "foo", "bar"}).Next(),
+			want:    gomplete.NewArgs([]string{"command", "foo", "bar"}).Next(),
 			args:    []string{"command", "foo", "bar", "baz"},
 			current: 3,
 		},
@@ -81,12 +81,12 @@ func TestArgs(t *testing.T) {
 				ShellConfig: &gomplete.ShellConfig{Args: testcase.args},
 				current:     testcase.current,
 			}
-			actual := shell.Args()
-			if actual == nil {
+			got := shell.Args()
+			if got == nil {
 				t.Error("args is nil")
 			}
-			if !reflect.DeepEqual(testcase.expect, actual) {
-				t.Errorf("expect %#v, but actual %#v", testcase.expect, actual)
+			if !reflect.DeepEqual(testcase.want, got) {
+				t.Errorf("want %#v, but got %#v", testcase.want, got)
 			}
 		})
 	}
@@ -103,10 +103,10 @@ func TestFormatReply(t *testing.T) {
 	if err := shell.FormatReply(reply, &buf); err != nil {
 		t.Fatal(err)
 	}
-	expect := "bar[BAR]\nbaz[BAZ]\nfoo"
-	actual := buf.String()
-	if actual != expect {
-		t.Errorf("output is wrong. expect %q, but actual %q", expect, actual)
+	want := "bar[BAR]\nbaz[BAZ]\nfoo"
+	got := buf.String()
+	if got != want {
+		t.Errorf("output is wrong. want %q, but got %q", want, got)
 	}
 }
 
@@ -138,9 +138,9 @@ func TestOutputScript(t *testing.T) {
 
 func TestUsage(t *testing.T) {
 	shell := Shell{}
-	expect := "source <(cmd -completion=zsh)"
-	actual := shell.Usage("cmd -completion=zsh")
-	if actual != expect {
-		t.Errorf("expect %q, but actual %q", expect, actual)
+	want := "source <(cmd -completion=zsh)"
+	got := shell.Usage("cmd -completion=zsh")
+	if got != want {
+		t.Errorf("want %q, but got %q", want, got)
 	}
 }

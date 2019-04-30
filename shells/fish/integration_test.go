@@ -1,6 +1,6 @@
-// +build !bash,!zsh
+// +build integration,!bash,!zsh
 
-package e2e
+package fish_test
 
 import (
 	"context"
@@ -12,6 +12,8 @@ import (
 	"testing"
 
 	"github.com/kr/pty"
+
+	"github.com/bgpat/gomplete/test"
 )
 
 func TestFish(t *testing.T) {
@@ -31,7 +33,7 @@ func TestFish(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), test.Timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "fish")
 	cmd.Dir = dir
@@ -49,33 +51,19 @@ func TestFish(t *testing.T) {
 	if _, err := tty.WriteString("source (examples -completion=fish | psub)\n"); err != nil {
 		t.Fatal(err)
 	}
-	if err := writeAndWait(ctx, tty, "examples "); err != nil {
-		t.Fatal(err)
-	}
+	test.WriteAndWait(ctx, t, tty, "examples ")
 	if _, err := tty.WriteString("\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err := waitString(ctx, tty, "foo")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("reply: %q", reply)
+	test.WaitString(ctx, t, tty, "foo")
 	if _, err := tty.WriteString("\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err = waitString(ctx, tty, "bar")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("reply: %q", reply)
+	test.WaitString(ctx, t, tty, "bar")
 	if _, err := tty.WriteString("\t\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err = waitString(ctx, tty, "hoge")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("reply: %q", reply)
+	reply := test.WaitString(ctx, t, tty, "hoge")
 	for _, arg := range []string{"hoge", "fuga", "piyo"} {
 		if !strings.Contains(reply, arg) {
 			t.Errorf("3rd sub-commands must include %q", arg)
