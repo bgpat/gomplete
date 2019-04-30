@@ -46,11 +46,11 @@ func TestRegisterShell(t *testing.T) {
 				}
 			})
 		}
-		expect := []string{"bar", "baz", "foo"}
-		actual := Shells()
-		sort.Strings(actual)
-		if !reflect.DeepEqual(expect, actual) {
-			t.Errorf("expect %#v, but actual %#v", expect, actual)
+		want := []string{"bar", "baz", "foo"}
+		got := Shells()
+		sort.Strings(got)
+		if !reflect.DeepEqual(want, got) {
+			t.Errorf("want %#v, but got %#v", want, got)
 		}
 	})
 	t.Run("nil", func(t *testing.T) {
@@ -130,11 +130,11 @@ func unregisterAllShells() {
 
 func TestNewShellConfig(t *testing.T) {
 	for name, testcase := range map[string]struct {
-		expect *ShellConfig
-		args   []string
+		want *ShellConfig
+		args []string
 	}{
 		"output script": {
-			expect: &ShellConfig{
+			want: &ShellConfig{
 				CommandName:     "foo",
 				CompleteCommand: []string{"/path/to/foo", "bar", "baz"},
 				Env:             map[string]string{},
@@ -143,7 +143,7 @@ func TestNewShellConfig(t *testing.T) {
 			args: []string{"/path/to/foo", "bar", "baz"},
 		},
 		"comlete": {
-			expect: &ShellConfig{
+			want: &ShellConfig{
 				CommandName:     "foo",
 				CompleteCommand: []string{"foo", "bar", "baz"},
 				Args:            []string{"foo", "hoge", "fuga", "piyo"},
@@ -153,13 +153,13 @@ func TestNewShellConfig(t *testing.T) {
 			args: []string{"foo", "bar", "baz", "--", "foo", "hoge", "fuga", "piyo"},
 		},
 		"no args": {
-			expect: &ShellConfig{
+			want: &ShellConfig{
 				ShellName: "sh",
 				Env:       map[string]string{},
 			},
 		},
 		"env": {
-			expect: &ShellConfig{
+			want: &ShellConfig{
 				ShellName: "sh",
 				Env: map[string]string{
 					"SHELL": "/bin/sh",
@@ -171,12 +171,12 @@ func TestNewShellConfig(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			os.Clearenv()
 			os.Args = testcase.args
-			for k, v := range testcase.expect.Env {
+			for k, v := range testcase.want.Env {
 				os.Setenv(k, v)
 			}
-			actual := NewShellConfig("sh")
-			if !reflect.DeepEqual(testcase.expect, actual) {
-				t.Errorf("expect %#v, but actual %#v", testcase.expect, actual)
+			got := NewShellConfig("sh")
+			if !reflect.DeepEqual(testcase.want, got) {
+				t.Errorf("want %#v, but got %#v", testcase.want, got)
 			}
 		})
 	}

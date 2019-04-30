@@ -10,7 +10,7 @@ func TestNewArgs(t *testing.T) {
 	src := []string{"foo", "bar", "baz"}
 	args := NewArgs(src)
 	if !reflect.DeepEqual(args.words, src) {
-		t.Errorf("words is not match to src. expect: %v, actual: %v", src, args.words)
+		t.Errorf("words is not match to src. want: %v, got: %v", src, args.words)
 	}
 	src[1] = "awesome"
 	if reflect.DeepEqual(args.words, src) {
@@ -19,7 +19,7 @@ func TestNewArgs(t *testing.T) {
 }
 
 func TestArgsCurrent(t *testing.T) {
-	for expect, args := range map[string]Args{
+	for want, args := range map[string]Args{
 		"zero": {
 			words: []string{"zero", "one", "two"},
 			index: 0,
@@ -33,10 +33,10 @@ func TestArgsCurrent(t *testing.T) {
 			index: 2,
 		},
 	} {
-		t.Run(expect, func(t *testing.T) {
-			actual := args.Current()
-			if expect != actual {
-				t.Errorf("Current argument is invalid. expect: %v, actual: %v", expect, actual)
+		t.Run(want, func(t *testing.T) {
+			got := args.Current()
+			if want != got {
+				t.Errorf("Current argument is invalid. want: %v, got: %v", want, got)
 			}
 		})
 	}
@@ -65,13 +65,13 @@ func TestArgsNext(t *testing.T) {
 			next := args.Next()
 			if i < 0 {
 				if next != nil {
-					t.Errorf("The next must be nil, but actual %v.", next)
+					t.Errorf("The next must be nil, but got %v.", next)
 				}
 			} else if next == nil {
-				t.Errorf("The next must not be nil. expect: %v", i)
+				t.Errorf("The next must not be nil. want: %v", i)
 			} else {
 				if i != next.index {
-					t.Errorf("The index of the next args is mismatch. expect: %v, actual: %v", i, next.index)
+					t.Errorf("The index of the next args is mismatch. want: %v, got: %v", i, next.index)
 				}
 			}
 		})

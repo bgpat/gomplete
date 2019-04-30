@@ -9,14 +9,14 @@ func TestCommandComplete(t *testing.T) {
 			description: "no arg",
 			args:        NewArgs([]string{""}),
 			completion:  comp,
-			expect:      Reply{"foo": "bar"},
+			want:        Reply{"foo": "bar"},
 			errorFormat: "Completion must return the reply.",
 		},
 		{
 			description: "partial arg",
 			args:        NewArgs([]string{"fo"}),
 			completion:  comp,
-			expect:      Reply{"foo": "bar"},
+			want:        Reply{"foo": "bar"},
 			errorFormat: "The reply must be the all of what contains the prefix.",
 		},
 		{
@@ -39,7 +39,7 @@ func TestCommandComplete(t *testing.T) {
 				Description: "bar",
 				Sub:         &Union{comp},
 			},
-			expect:      Reply{"foo": "bar"},
+			want:        Reply{"foo": "bar"},
 			errorFormat: "Completion must return the nested reply.",
 		},
 	} {

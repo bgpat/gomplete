@@ -10,20 +10,20 @@ type testCase struct {
 	description string
 	args        *Args
 	completion  Completion
-	expect      Reply
+	want        Reply
 	errorFormat string
 }
 
 func (tc *testCase) run(t *testing.T) {
 	t.Run(tc.description, func(t *testing.T) {
-		actual := tc.completion.Complete(context.Background(), tc.args)
-		if tc.expect == nil {
-			if len(actual) > 0 {
-				t.Errorf(tc.errorFormat+" expect: %#v, actual: %#v", tc.expect, actual)
+		got := tc.completion.Complete(context.Background(), tc.args)
+		if tc.want == nil {
+			if len(got) > 0 {
+				t.Errorf(tc.errorFormat+" want: %#v, got: %#v", tc.want, got)
 			}
 		} else {
-			if !reflect.DeepEqual(actual, tc.expect) {
-				t.Errorf(tc.errorFormat+" expect: %#v, actual: %#v", tc.expect, actual)
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Errorf(tc.errorFormat+" want: %#v, got: %#v", tc.want, got)
 			}
 		}
 	})
