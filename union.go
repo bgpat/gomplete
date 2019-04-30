@@ -13,6 +13,9 @@ func (u *Union) Complete(ctx context.Context, args *Args) Reply {
 	}
 	reply := Reply{}
 	for _, comp := range *u {
+		if comp == nil {
+			continue
+		}
 		for k, v := range comp.Complete(ctx, args) {
 			reply[k] = v
 		}
