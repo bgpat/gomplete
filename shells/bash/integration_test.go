@@ -1,4 +1,4 @@
-// +build !zsh,!fish
+// +build integration,!zsh,!fish
 
 package e2e
 
@@ -48,19 +48,15 @@ func TestBash(t *testing.T) {
 	if _, err := tty.WriteString("\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err := waitString(ctx, tty, "foo")
-	if err != nil {
+	if _, err := waitString(ctx, tty, "foo"); err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("reply %q", reply)
 	if _, err := tty.WriteString("\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err = waitString(ctx, tty, "bar")
-	if err != nil {
+	if err := waitString(ctx, tty, "bar"); err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("reply %q", reply)
 	if _, err := tty.WriteString("\t\t"); err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +64,6 @@ func TestBash(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("reply: %q", reply)
 	for _, arg := range []string{"hoge", "fuga", "piyo"} {
 		if !strings.Contains(reply, arg) {
 			t.Errorf("3rd sub-commands must include %q", arg)

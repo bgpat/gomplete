@@ -1,9 +1,12 @@
-package e2e
+// +build integration
+
+package test
 
 import (
 	"context"
 	"io"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/pkg/errors"
@@ -11,15 +14,19 @@ import (
 
 const timeout = 5 * time.Second
 
-func writeAndWait(ctx context.Context, r io.ReadWriter, s string) error {
+// WriteAndWait writes the string and waits the terminal response.
+func WriteAndWait(ctx context.Context, tb *testing.TB, r io.ReadWriter, s string) error {
+	tb.Helper()
 	if _, err := io.WriteString(r, s); err != nil {
 		return errors.WithStack(err)
 	}
-	_, err := waitString(ctx, r, s)
+	_, err := waitString(ctx, tb, r, s)
 	return errors.WithStack(err)
 }
 
-func waitString(ctx context.Context, r io.Reader, s string) (text string, err error) {
+// WaitString waits the terminal still the presented string is printed.
+func WaitString(ctx context.Context, tb *testing.TB, r io.Reader, s string) (text string, err error) {
+	tb.Helper()
 	ticker := time.NewTicker(time.Millisecond)
 	defer ticker.Stop()
 	for {
@@ -32,7 +39,9 @@ func waitString(ctx context.Context, r io.Reader, s string) (text string, err er
 			if err != nil {
 				return text, errors.Wrapf(err, "wait %q, but received %q", s, text)
 			}
-			text += string(buf[:n])
+			curr := string(buf[:n])
+			text += curr
+			tb.Log(curr)
 			if strings.LastIndex(text, s) >= 0 {
 				return text, nil
 			}

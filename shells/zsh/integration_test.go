@@ -1,4 +1,4 @@
-// +build !bash,!zsh
+// +build integration,!bash,!fish
 
 package e2e
 
@@ -14,7 +14,7 @@ import (
 	"github.com/kr/pty"
 )
 
-func TestFish(t *testing.T) {
+func TestZsh(t *testing.T) {
 	dir, err := ioutil.TempDir("", "example")
 	if err != nil {
 		t.Fatal(err)
@@ -33,20 +33,16 @@ func TestFish(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "fish")
-	cmd.Dir = dir
-	cmd.Env = []string{
-		"PATH=" + dir + ":" + os.Getenv("PATH"),
-		"TERM=xterm",
-	}
+	cmd := exec.CommandContext(ctx, "zsh", "--no-rcs", "-o", "errexit")
+	cmd.Env = []string{"PATH=" + dir}
 	tty, err := pty.Start(cmd)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := pty.Setsize(tty, &pty.Winsize{Rows: 20, Cols: 80}); err != nil {
+	if _, err := tty.WriteString("autoload -U compinit && compinit\n"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := tty.WriteString("source (examples -completion=fish | psub)\n"); err != nil {
+	if _, err := tty.WriteString("source <(examples -completion=zsh)\n"); err != nil {
 		t.Fatal(err)
 	}
 	if err := writeAndWait(ctx, tty, "examples "); err != nil {
@@ -71,7 +67,7 @@ func TestFish(t *testing.T) {
 	if _, err := tty.WriteString("\t\t"); err != nil {
 		t.Fatal(err)
 	}
-	reply, err = waitString(ctx, tty, "hoge")
+	reply, err = waitString(ctx, tty, "examples foo bar")
 	if err != nil {
 		t.Fatal(err)
 	}

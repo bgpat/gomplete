@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/bgpat/gomplete"
-	gomplete_testing "github.com/bgpat/gomplete/testing"
+	test "github.com/bgpat/gomplete/test"
 )
 
 func TestMain(m *testing.M) {
@@ -18,7 +18,7 @@ func TestMain(m *testing.M) {
 	stdout = &bytes.Buffer{}
 
 	gomplete.RegisterShell("fake", func(*gomplete.ShellConfig) (gomplete.Shell, error) {
-		return &gomplete_testing.FakeShell{
+		return &test.FakeShell{
 			ShellConfig: &gomplete.ShellConfig{
 				CommandName:     "cmd",
 				CompleteCommand: []string{"sub1", "sub2"},
@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 		}, nil
 	})
 	gomplete.RegisterShell("fake_noargs", func(*gomplete.ShellConfig) (gomplete.Shell, error) {
-		return &gomplete_testing.FakeShell{
+		return &test.FakeShell{
 			ShellConfig: &gomplete.ShellConfig{
 				CommandName:     "cmd",
 				CompleteCommand: []string{"sub1", "sub2"},
