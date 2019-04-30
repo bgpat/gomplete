@@ -25,7 +25,7 @@ orbs:
         - run: bash <(curl -s https://codecov.io/bash)
       integration-test:
         steps:
-        - run: go test -v -race -tags=${TARGET_SHELL} ./shells/${TARGET_SHELL}/integration_test.go
+        - run: go test -v -race -tags="integration ${TARGET_SHELL}" ./shells/${TARGET_SHELL}/integration_test.go
 jobs:
   test:
     executor:
