@@ -8,24 +8,22 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
-const timeout = 5 * time.Second
+// Timeout is the timeout seconds.
+const Timeout = 5 * time.Second
 
 // WriteAndWait writes the string and waits the terminal response.
-func WriteAndWait(ctx context.Context, tb *testing.TB, r io.ReadWriter, s string) error {
+func WriteAndWait(ctx context.Context, tb testing.TB, r io.ReadWriter, s string) {
 	tb.Helper()
 	if _, err := io.WriteString(r, s); err != nil {
-		return errors.WithStack(err)
+		tb.Fatal(err)
 	}
-	_, err := waitString(ctx, tb, r, s)
-	return errors.WithStack(err)
+	WaitString(ctx, tb, r, s)
 }
 
 // WaitString waits the terminal still the presented string is printed.
-func WaitString(ctx context.Context, tb *testing.TB, r io.Reader, s string) (text string, err error) {
+func WaitString(ctx context.Context, tb testing.TB, r io.Reader, s string) (text string) {
 	tb.Helper()
 	ticker := time.NewTicker(time.Millisecond)
 	defer ticker.Stop()
@@ -37,13 +35,13 @@ func WaitString(ctx context.Context, tb *testing.TB, r io.Reader, s string) (tex
 			buf := make([]byte, 1024)
 			n, err := r.Read(buf)
 			if err != nil {
-				return text, errors.Wrapf(err, "wait %q, but received %q", s, text)
+				tb.Fatalf("wait %q, but received %q: %v", s, text, err)
 			}
 			curr := string(buf[:n])
 			text += curr
-			tb.Log(curr)
+			tb.Logf("reply: %q", curr)
 			if strings.LastIndex(text, s) >= 0 {
-				return text, nil
+				return
 			}
 		}
 	}
